@@ -16,6 +16,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { SyncIndicator } from "./SyncIndicator";
 import { CreateBoardDialog } from "@/features/boards";
 import { signOut } from "@/features/auth";
 
@@ -65,6 +66,9 @@ export function Sidebar({ user }: Props) {
         </Tooltip>
 
         <div className="flex-1" />
+
+        {/* Sync status */}
+        <SyncIndicator />
 
         {/* Theme & Language */}
         <ThemeSwitcher />

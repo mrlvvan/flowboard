@@ -1,0 +1,18 @@
+{
+  "title": "My boards",
+  "empty": "No boards yet",
+  "emptySubtitle": "Create your first board to get started",
+  "newBoard": "New board",
+  "createBoard": "Create board",
+  "boardName": "Board name",
+  "boardNamePlaceholder": "e.g. Product roadmap",
+  "renameBoard": "Rename board",
+  "deleteBoard": "Delete board",
+  "deleteBoardConfirm": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+  "archiveBoard": "Archive board",
+  "archivedBoards": "Archived boards",
+  "openBoard": "Open board",
+  "lastUpdated": "Updated {{date}}",
+  "member": "{{count}} member",
+  "member_other": "{{count}} members"
+}

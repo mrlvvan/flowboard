@@ -1,0 +1,14 @@
+{
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "rename": "Rename",
+  "archive": "Archive",
+  "loading": "Loading...",
+  "error": "Something went wrong",
+  "retry": "Retry",
+  "confirm": "Confirm",
+  "back": "Back",
+  "or": "or"
+}

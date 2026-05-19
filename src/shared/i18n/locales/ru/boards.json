@@ -1,0 +1,19 @@
+{
+  "title": "Мои доски",
+  "empty": "Досок пока нет",
+  "emptySubtitle": "Создайте первую доску, чтобы начать",
+  "newBoard": "Новая доска",
+  "createBoard": "Создать доску",
+  "boardName": "Название доски",
+  "boardNamePlaceholder": "например, Дорожная карта",
+  "renameBoard": "Переименовать доску",
+  "deleteBoard": "Удалить доску",
+  "deleteBoardConfirm": "Вы уверены, что хотите удалить «{{name}}»? Это действие нельзя отменить.",
+  "archiveBoard": "Архивировать доску",
+  "archivedBoards": "Архивные доски",
+  "openBoard": "Открыть доску",
+  "lastUpdated": "Обновлено {{date}}",
+  "member": "{{count}} участник",
+  "member_few": "{{count}} участника",
+  "member_many": "{{count}} участников"
+}

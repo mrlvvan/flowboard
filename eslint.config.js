@@ -35,6 +35,13 @@ export default tseslint.config(
         "error",
         { argsIgnorePattern: "^_" },
       ],
+      // react-hook-form and other libs return Promise<void> from event handlers — safe in practice
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        { checksVoidReturn: { attributes: false } },
+      ],
+      // autoFocus is acceptable in modals for UX
+      "jsx-a11y/no-autofocus": "off",
     },
   },
   {

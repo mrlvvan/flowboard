@@ -6,7 +6,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import prettierConfig from "eslint-config-prettier";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", ".husky", "*.config.ts", "*.config.js"] },
+  { ignores: ["dist", "node_modules", ".husky", "*.config.ts", "*.config.js", "e2e/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {
@@ -31,10 +31,7 @@ export default tseslint.config(
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.configs.recommended.rules,
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_" },
-      ],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       // react-hook-form and other libs return Promise<void> from event handlers — safe in practice
       "@typescript-eslint/no-misused-promises": [
         "error",

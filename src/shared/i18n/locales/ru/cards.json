@@ -1,0 +1,32 @@
+{
+  "addCard": "Добавить карточку",
+  "newCard": "Новая карточка",
+  "cardTitle": "Название карточки",
+  "cardTitlePlaceholder": "Введите название",
+  "description": "Описание",
+  "descriptionPlaceholder": "Добавить описание…",
+  "dueDate": "Срок",
+  "labels": "Метки",
+  "checklist": "Чеклист",
+  "addChecklistItem": "Добавить пункт",
+  "checklistItemPlaceholder": "Новый пункт",
+  "deleteCard": "Удалить карточку",
+  "deleteCardConfirm": "Удалить эту карточку? Это нельзя отменить.",
+  "progress": "{{done}}/{{total}} выполнено",
+  "noDueDate": "Без срока",
+  "overdue": "Просрочено",
+  "dueToday": "Сегодня",
+  "labelColors": {
+    "red": "Красный",
+    "orange": "Оранжевый",
+    "yellow": "Жёлтый",
+    "green": "Зелёный",
+    "blue": "Синий",
+    "purple": "Фиолетовый"
+  },
+  "addColumn": "Добавить колонку",
+  "columnName": "Название колонки",
+  "columnNamePlaceholder": "например, К выполнению",
+  "deleteColumn": "Удалить колонку",
+  "deleteColumnConfirm": "Удалить «{{name}}» и все карточки? Это нельзя отменить."
+}

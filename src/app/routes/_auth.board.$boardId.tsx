@@ -1,4 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { supabase } from "@/shared/lib/supabase";
+import { boardKeys } from "@/features/boards/api/keys";
+import { KanbanBoard } from "@/features/columns/components/KanbanBoard";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 export const Route = createFileRoute("/_auth/board/$boardId")({
   component: BoardPage,
@@ -7,14 +14,36 @@ export const Route = createFileRoute("/_auth/board/$boardId")({
 function BoardPage() {
   const { boardId } = Route.useParams();
 
+  const { data: board, isLoading } = useQuery({
+    queryKey: boardKeys.detail(boardId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("boards")
+        .select("*")
+        .eq("id", boardId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-4 border-b px-6 py-3">
-        <h1 className="text-lg font-semibold">Board</h1>
-        <span className="text-sm text-muted-foreground">{boardId}</span>
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b bg-background/80 px-6 py-3 backdrop-blur">
+        <Link to="/" className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        {isLoading ? (
+          <Skeleton className="h-5 w-40" />
+        ) : (
+          <h1 className="text-lg font-semibold">{board?.name ?? "Board"}</h1>
+        )}
       </div>
-      <div className="flex-1 overflow-x-auto p-6">
-        <p className="text-muted-foreground">Kanban board coming in Stage 2…</p>
+
+      {/* Board content */}
+      <div className="flex-1 overflow-hidden">
+        <KanbanBoard boardId={boardId} />
       </div>
     </div>
   );

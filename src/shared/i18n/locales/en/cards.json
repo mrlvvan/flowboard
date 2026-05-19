@@ -1,0 +1,32 @@
+{
+  "addCard": "Add card",
+  "newCard": "New card",
+  "cardTitle": "Card title",
+  "cardTitlePlaceholder": "Enter card title",
+  "description": "Description",
+  "descriptionPlaceholder": "Add a description…",
+  "dueDate": "Due date",
+  "labels": "Labels",
+  "checklist": "Checklist",
+  "addChecklistItem": "Add item",
+  "checklistItemPlaceholder": "New item",
+  "deleteCard": "Delete card",
+  "deleteCardConfirm": "Delete this card? This cannot be undone.",
+  "progress": "{{done}}/{{total}} done",
+  "noDueDate": "No due date",
+  "overdue": "Overdue",
+  "dueToday": "Due today",
+  "labelColors": {
+    "red": "Red",
+    "orange": "Orange",
+    "yellow": "Yellow",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple"
+  },
+  "addColumn": "Add column",
+  "columnName": "Column name",
+  "columnNamePlaceholder": "e.g. To Do",
+  "deleteColumn": "Delete column",
+  "deleteColumnConfirm": "Delete \"{{name}}\" and all its cards? This cannot be undone."
+}

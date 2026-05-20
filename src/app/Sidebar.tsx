@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
-import { Plus, LogOut, Download, Search } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
-import { Button } from "@/shared/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
-import { Separator } from "@/shared/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import {
   DropdownMenu,
@@ -14,8 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { ThemeSwitcher } from "./ThemeSwitcher";
-import { LanguageSwitcher } from "./LanguageSwitcher";
+import { I } from "@/shared/ui/icons";
 import { SyncIndicator } from "./SyncIndicator";
 import { CreateBoardDialog } from "@/features/boards";
 import { signOut } from "@/features/auth";
@@ -30,8 +24,49 @@ function initials(name?: string | null, email?: string) {
   return (email ?? "?").slice(0, 2).toUpperCase();
 }
 
+/** Single icon-button in the sidebar */
+function SidebarBtn({
+  children,
+  active = false,
+  badge = false,
+  tip,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  badge?: boolean;
+  tip?: string;
+  onClick?: () => void;
+}) {
+  const btn = (
+    <button
+      onClick={onClick}
+      className={`relative grid h-10 w-10 place-items-center rounded-xl transition-all ${
+        active
+          ? "bg-white/[0.08] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+          : "text-white/45 hover:bg-white/[0.04] hover:text-white"
+      }`}
+    >
+      {active && (
+        <span className="absolute top-1/2 -left-[10px] h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-indigo-400 to-violet-500" />
+      )}
+      {children}
+      {badge && (
+        <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-violet-400" />
+      )}
+    </button>
+  );
+
+  if (!tip) return btn;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{btn}</TooltipTrigger>
+      <TooltipContent side="right">{tip}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function Sidebar({ user }: Props) {
-  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -45,7 +80,7 @@ export function Sidebar({ user }: Props) {
   });
 
   const fullName = user.user_metadata["full_name"] as string | undefined;
-  const avatarUrl = user.user_metadata["avatar_url"] as string | undefined;
+  const userInitials = initials(fullName, user.email);
 
   const handleSignOut = async () => {
     await signOut();
@@ -54,102 +89,97 @@ export function Sidebar({ user }: Props) {
 
   return (
     <>
-      <aside className="bg-card flex h-screen w-14 flex-col items-center gap-2 border-r py-3">
+      <aside className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-white/[0.05] bg-black/30 py-4">
         {/* Logo */}
-        <Link
-          to="/"
-          className="bg-primary text-primary-foreground mb-2 flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold"
-        >
-          FB
+        <Link to="/" className="mb-3">
+          <I.Logo size={28} />
         </Link>
 
-        <Separator className="w-8" />
+        {/* Nav icons */}
+        <SidebarBtn tip="Search (/ or Ctrl+K)" onClick={() => setSearchOpen(true)}>
+          {I.Search}
+        </SidebarBtn>
 
-        {/* Search */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search (/ or Ctrl+K)"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">Search (/ or Ctrl+K)</TooltipContent>
-        </Tooltip>
+        <SidebarBtn active tip="Boards">
+          <I.Logo size={16} />
+        </SidebarBtn>
+
+        <SidebarBtn tip="All boards">{I.Grid}</SidebarBtn>
+
+        <SidebarBtn tip="Starred boards">{I.Star}</SidebarBtn>
 
         {/* New board */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={() => setCreateOpen(true)}
-              aria-label="New board"
+              className="fb-grad-btn mt-1 grid h-10 w-10 place-items-center rounded-xl text-white"
             >
-              <Plus className="h-4 w-4" />
-            </Button>
+              {I.Plus}
+            </button>
           </TooltipTrigger>
-          <TooltipContent side="right">New board</TooltipContent>
+          <TooltipContent side="right">New board (N)</TooltipContent>
         </Tooltip>
 
-        <div className="flex-1" />
+        {/* Bottom section */}
+        <div className="mt-auto flex flex-col items-center gap-1">
+          {/* Sync indicator */}
+          <SyncIndicator />
 
-        {/* Install PWA */}
-        {canInstall && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => void install()}
-                aria-label="Install app"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Install app</TooltipContent>
-          </Tooltip>
-        )}
+          {/* Notifications */}
+          <SidebarBtn badge tip="Notifications">
+            {I.Bell}
+          </SidebarBtn>
 
-        {/* Sync status */}
-        <SyncIndicator />
+          {/* Install PWA */}
+          {canInstall && (
+            <SidebarBtn tip="Install app" onClick={() => void install()}>
+              {I.Cloud}
+            </SidebarBtn>
+          )}
 
-        {/* Theme & Language */}
-        <ThemeSwitcher />
-        <LanguageSwitcher />
-
-        <Separator className="w-8" />
-
-        {/* User menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button aria-label="User menu">
-              <Avatar className="hover:ring-primary h-9 w-9 cursor-pointer ring-2 ring-transparent transition-all">
-                <AvatarImage src={avatarUrl} alt={fullName ?? user.email} />
-                <AvatarFallback className="text-xs">
-                  {initials(fullName, user.email)}
-                </AvatarFallback>
-              </Avatar>
+          {/* Theme toggle */}
+          <div className="my-1 flex h-[42px] w-10 flex-col gap-0.5 rounded-xl border border-white/[0.06] bg-black/30 p-0.5">
+            <button className="grid flex-1 place-items-center rounded-md bg-white/[0.08] text-white">
+              {I.Moon}
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="right" align="end" className="w-48">
-            <div className="px-2 py-1.5">
-              <p className="text-sm font-medium">{fullName ?? "User"}</p>
-              <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={() => void handleSignOut()}
+            <button className="grid flex-1 place-items-center rounded-md text-white/30">
+              {I.Sun}
+            </button>
+          </div>
+
+          {/* User avatar / menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="User menu"
+                className="grid h-8 w-8 place-items-center rounded-full text-[11px] font-semibold text-white ring-2 ring-[#0c0c14] transition-all hover:ring-violet-400/40"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                }}
+              >
+                {userInitials}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="right"
+              align="end"
+              className="w-48 border-white/10 bg-[#13131f] text-white"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              {t("logout")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <div className="px-2 py-1.5">
+                <p className="text-sm font-medium">{fullName ?? "User"}</p>
+                <p className="truncate text-xs text-white/45">{user.email}</p>
+              </div>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem
+                className="cursor-pointer text-rose-300 focus:bg-rose-500/10 focus:text-rose-200"
+                onClick={() => void handleSignOut()}
+              >
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </aside>
 
       <CreateBoardDialog open={createOpen} onOpenChange={setCreateOpen} />

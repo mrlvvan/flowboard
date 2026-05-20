@@ -2,7 +2,6 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/shared/lib/supabase";
 import { Sidebar } from "../Sidebar";
 
-
 export const Route = createFileRoute("/_auth")({
   beforeLoad: async ({ location }) => {
     const {
@@ -23,9 +22,9 @@ function AuthLayout() {
   const { user } = Route.useRouteContext();
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="fb-bg flex h-screen overflow-hidden text-white">
       <Sidebar user={user} />
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-w-0 flex-1 overflow-hidden">
         <Outlet />
       </main>
     </div>

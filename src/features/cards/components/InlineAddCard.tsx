@@ -1,8 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { Plus, X } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { Textarea } from "@/shared/ui/textarea";
+import { I } from "@/shared/ui/icons";
 import { useCreateCardMutation } from "../api/useCardsQuery";
 
 type Props = {
@@ -12,7 +9,6 @@ type Props = {
 };
 
 export function InlineAddCard({ boardId, columnId, lastPosition }: Props) {
-  const { t } = useTranslation("cards");
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -40,41 +36,43 @@ export function InlineAddCard({ boardId, columnId, lastPosition }: Props) {
 
   if (!open) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className="w-full justify-start gap-1 text-muted-foreground"
+      <button
         onClick={() => setOpen(true)}
+        className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] text-white/40 transition hover:bg-white/[0.04] hover:text-white/85"
       >
-        <Plus className="h-4 w-4" />
-        {t("addCard")}
-      </Button>
+        <span className="text-white/35">{I.Plus}</span> Add a card
+      </button>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <Textarea
+    <div className="mt-0.5 space-y-2">
+      <textarea
         ref={textareaRef}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={t("cardTitlePlaceholder")}
+        placeholder="Card title…"
         rows={2}
-        className="resize-none text-sm"
+        className="fb-input w-full resize-none rounded-xl p-2.5 text-[13px]"
       />
       <div className="flex items-center gap-2">
-        <Button size="sm" onClick={() => void submit()} disabled={mutation.isPending}>
-          {t("addCard")}
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8"
-          onClick={() => { setOpen(false); setTitle(""); }}
+        <button
+          onClick={() => void submit()}
+          disabled={mutation.isPending}
+          className="fb-grad-btn h-8 rounded-lg px-3 text-[12.5px] font-medium text-white disabled:opacity-60"
         >
-          <X className="h-4 w-4" />
-        </Button>
+          Add card
+        </button>
+        <button
+          onClick={() => {
+            setOpen(false);
+            setTitle("");
+          }}
+          className="rounded-lg p-1.5 text-white/40 transition hover:bg-white/[0.05] hover:text-white"
+        >
+          {I.X}
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,116 @@
 @import "tailwindcss";
 
+/* ─── FlowBoard design-system utilities ───────────────────────────── */
+
+.fb-bg {
+  background: #0a0a0f;
+}
+
+.fb-glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.fb-glass-strong {
+  background: rgba(10, 10, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+}
+
+.fb-ring-inner {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.fb-lift {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.fb-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.fb-grad-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  transition:
+    filter 0.15s ease,
+    transform 0.1s ease;
+}
+.fb-grad-btn:hover {
+  filter: brightness(1.1);
+}
+.fb-grad-btn:active {
+  transform: scale(0.97);
+}
+
+.fb-input {
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.fb-input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.13);
+}
+.fb-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Custom scrollbars */
+.fb-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+.fb-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.fb-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fb-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+.fb-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* Drag handle dots */
+.fb-handle {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.45) 1px, transparent 1px);
+  background-size: 3px 3px;
+  border-radius: 2px;
+}
+
+/* Pulse animation for status dots */
+@keyframes fb-pulse-anim {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+.fb-pulse {
+  animation: fb-pulse-anim 2s ease-in-out infinite;
+}
+
+/* ─── Tailwind CSS variables (shadcn) ─────────────────────────────── */
+
 @layer base {
   :root {
     --background: 0 0% 100%;

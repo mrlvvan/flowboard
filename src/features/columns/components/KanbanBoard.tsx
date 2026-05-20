@@ -18,12 +18,14 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
-import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
-import { Button } from "@/shared/ui/button";
+import { I } from "@/shared/ui/icons";
 import { Input } from "@/shared/ui/input";
-import { Skeleton } from "@/shared/ui/skeleton";
-import { useColumnsQuery, useUpdateColumnMutation, useDeleteColumnMutation, useCreateColumnMutation } from "../api/useColumnsQuery";
+import {
+  useColumnsQuery,
+  useUpdateColumnMutation,
+  useDeleteColumnMutation,
+  useCreateColumnMutation,
+} from "../api/useColumnsQuery";
 import { useCardsQuery, useUpdateCardMutation } from "@/features/cards/api/useCardsQuery";
 import { positionBetween } from "@/shared/lib/position";
 import { KanbanColumn } from "./KanbanColumn";
@@ -33,7 +35,6 @@ import type { Card } from "@/features/cards/api/cardsApi";
 type Props = { boardId: string };
 
 export function KanbanBoard({ boardId }: Props) {
-  const { t } = useTranslation("cards");
   const { data: columns = [], isLoading: colLoading } = useColumnsQuery(boardId);
   const { data: cards = [], isLoading: cardLoading } = useCardsQuery(boardId);
 
@@ -68,13 +69,12 @@ export function KanbanBoard({ boardId }: Props) {
     const overData = over.data.current;
     if (activeData?.type !== "card") return;
 
-    const activeCard = activeData.card as Card;
-    // Dropping card over a column (empty)
+    const activeCardData = activeData.card as Card;
     if (overData?.type === "column") {
       const targetColumn = overData.column as Column;
-      if (activeCard.column_id !== targetColumn.id) {
+      if (activeCardData.column_id !== targetColumn.id) {
         void updateCard.mutateAsync({
-          id: activeCard.id,
+          id: activeCardData.id,
           patch: { column_id: targetColumn.id, position: positionBetween(undefined, undefined) },
         });
       }
@@ -90,7 +90,6 @@ export function KanbanBoard({ boardId }: Props) {
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    // Column reorder
     if (activeData?.type === "column" && overData?.type === "column") {
       const oldIndex = columns.findIndex((c) => c.id === active.id);
       const newIndex = columns.findIndex((c) => c.id === over.id);
@@ -102,9 +101,8 @@ export function KanbanBoard({ boardId }: Props) {
       return;
     }
 
-    // Card reorder / move
     if (activeData?.type === "card" && overData?.type === "card") {
-      const activeCard = activeData.card as Card;
+      const activeCardData = activeData.card as Card;
       const overCard = overData.card as Card;
       const targetColumnCards = cardsForColumn(overCard.column_id);
       const overIndex = targetColumnCards.findIndex((c) => c.id === overCard.id);
@@ -112,7 +110,7 @@ export function KanbanBoard({ boardId }: Props) {
       const next = targetColumnCards[overIndex]?.position;
       const newPosition = positionBetween(prev, next);
       void updateCard.mutateAsync({
-        id: activeCard.id,
+        id: activeCardData.id,
         patch: { column_id: overCard.column_id, position: newPosition },
       });
     }
@@ -129,9 +127,9 @@ export function KanbanBoard({ boardId }: Props) {
 
   if (colLoading || cardLoading) {
     return (
-      <div className="flex gap-4 p-6">
+      <div className="flex h-full gap-4 p-6">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-64 w-72 rounded-xl" />
+          <div key={i} className="fb-glass h-64 w-[300px] shrink-0 animate-pulse rounded-2xl" />
         ))}
       </div>
     );
@@ -145,17 +143,15 @@ export function KanbanBoard({ boardId }: Props) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full gap-4 overflow-x-auto p-6 pb-8">
-        <SortableContext
-          items={columns.map((c) => c.id)}
-          strategy={horizontalListSortingStrategy}
-        >
-          {columns.map((col) => (
+      <div className="fb-scroll flex h-full gap-4 overflow-x-auto p-6 pb-8">
+        <SortableContext items={columns.map((c) => c.id)} strategy={horizontalListSortingStrategy}>
+          {columns.map((col, idx) => (
             <KanbanColumn
               key={col.id}
               column={col}
               cards={cardsForColumn(col.id)}
               boardId={boardId}
+              colorIndex={idx}
               onRename={(id, name) => void updateColumn.mutateAsync({ id, patch: { name } })}
               onDelete={(id) => void deleteColumn.mutateAsync(id)}
             />
@@ -163,30 +159,42 @@ export function KanbanBoard({ boardId }: Props) {
         </SortableContext>
 
         {/* Add column */}
-        <div className="w-72 shrink-0">
+        <div className="w-[280px] shrink-0 self-start">
           {addingColumn ? (
-            <div className="rounded-xl border bg-muted/50 p-3 space-y-2">
+            <div className="fb-glass space-y-2 rounded-2xl p-3">
               <Input
                 value={newColName}
                 onChange={(e) => setNewColName(e.target.value)}
-                placeholder={t("columnNamePlaceholder")}
-                onKeyDown={(e) => { if (e.key === "Enter") void addColumn(); if (e.key === "Escape") setAddingColumn(false); }}
+                placeholder="Column name…"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void addColumn();
+                  if (e.key === "Escape") setAddingColumn(false);
+                }}
                 autoFocus
+                className="border-white/10 bg-black/30 text-white placeholder:text-white/30 focus-visible:border-violet-400/50 focus-visible:ring-0"
               />
               <div className="flex gap-2">
-                <Button size="sm" onClick={() => void addColumn()}>{t("addColumn")}</Button>
-                <Button size="sm" variant="ghost" onClick={() => setAddingColumn(false)}>✕</Button>
+                <button
+                  onClick={() => void addColumn()}
+                  className="fb-grad-btn h-8 rounded-lg px-3 text-[13px] font-medium text-white"
+                >
+                  Add column
+                </button>
+                <button
+                  onClick={() => setAddingColumn(false)}
+                  className="h-8 rounded-lg px-3 text-[13px] text-white/50 transition hover:bg-white/[0.05] hover:text-white"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-2 rounded-xl border-dashed"
+            <button
               onClick={() => setAddingColumn(true)}
+              className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-white/[0.08] py-3 text-[13px] font-medium text-white/50 transition hover:border-violet-400/40 hover:bg-white/[0.02] hover:text-white"
             >
-              <Plus className="h-4 w-4" />
-              {t("addColumn")}
-            </Button>
+              {I.Plus} Add column
+            </button>
           )}
         </div>
       </div>
@@ -195,16 +203,16 @@ export function KanbanBoard({ boardId }: Props) {
       {createPortal(
         <DragOverlay>
           {activeCard && (
-            <div className="rotate-2 cursor-grabbing opacity-80">
-              <div className="rounded-lg border bg-card px-3 py-2 shadow-xl">
-                <p className="text-sm">{activeCard.title}</p>
+            <div className="rotate-2 cursor-grabbing opacity-90">
+              <div className="fb-glass w-[280px] rounded-xl px-3 py-2 shadow-2xl">
+                <p className="text-sm text-white/90">{activeCard.title}</p>
               </div>
             </div>
           )}
           {activeColumn && (
             <div className="rotate-1 cursor-grabbing opacity-80">
-              <div className="w-72 rounded-xl border bg-muted/50 px-3 py-2 shadow-xl">
-                <p className="text-sm font-medium">{activeColumn.name}</p>
+              <div className="fb-glass w-[300px] rounded-2xl px-3 py-2 shadow-2xl">
+                <p className="text-sm font-medium text-white/90">{activeColumn.name}</p>
               </div>
             </div>
           )}

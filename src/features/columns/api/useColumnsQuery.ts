@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { columnKeys } from "./keys";
 import { createColumn, deleteColumn, fetchColumns, updateColumn, type Column } from "./columnsApi";
 
@@ -15,6 +16,9 @@ export function useCreateColumnMutation(boardId: string) {
     mutationFn: ({ name, afterPosition }: { name: string; afterPosition?: string }) =>
       createColumn(boardId, name, afterPosition),
     onSuccess: () => void qc.invalidateQueries({ queryKey: columnKeys.byBoard(boardId) }),
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to create column");
+    },
   });
 }
 
@@ -26,8 +30,12 @@ export function useUpdateColumnMutation(boardId: string) {
     onMutate: async ({ id, patch }) => {
       await qc.cancelQueries({ queryKey: columnKeys.byBoard(boardId) });
       const prev = qc.getQueryData<Column[]>(columnKeys.byBoard(boardId));
-      qc.setQueryData<Column[]>(columnKeys.byBoard(boardId), (old) =>
-        old?.map((c) => (c.id === id ? { ...c, ...patch } : c)).sort((a, b) => a.position.localeCompare(b.position)) ?? []
+      qc.setQueryData<Column[]>(
+        columnKeys.byBoard(boardId),
+        (old) =>
+          old
+            ?.map((c) => (c.id === id ? { ...c, ...patch } : c))
+            .sort((a, b) => a.position.localeCompare(b.position)) ?? []
       );
       return { prev };
     },
@@ -45,7 +53,10 @@ export function useDeleteColumnMutation(boardId: string) {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: columnKeys.byBoard(boardId) });
       const prev = qc.getQueryData<Column[]>(columnKeys.byBoard(boardId));
-      qc.setQueryData<Column[]>(columnKeys.byBoard(boardId), (old) => old?.filter((c) => c.id !== id) ?? []);
+      qc.setQueryData<Column[]>(
+        columnKeys.byBoard(boardId),
+        (old) => old?.filter((c) => c.id !== id) ?? []
+      );
       return { prev };
     },
     onError: (_err, _vars, ctx) => {

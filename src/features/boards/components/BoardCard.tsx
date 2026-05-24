@@ -13,6 +13,8 @@ import {
 import { I } from "@/shared/ui/icons";
 import { RenameBoardDialog } from "./RenameBoardDialog";
 import { DeleteBoardDialog } from "./DeleteBoardDialog";
+import { useUpdateBoardMutation } from "../api/useBoardsQuery";
+import { toast } from "sonner";
 import type { Board } from "../types";
 
 type Props = { board: Board };
@@ -41,6 +43,33 @@ export function BoardCard({ board }: Props) {
   const { t, i18n } = useTranslation("boards");
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const updateMutation = useUpdateBoardMutation();
+
+  const handleArchive = async () => {
+    try {
+      await updateMutation.mutateAsync({ id: board.id, patch: { is_archived: true } });
+      toast.success("Board archived");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to archive");
+    }
+  };
+
+  const handleUnarchive = async () => {
+    try {
+      await updateMutation.mutateAsync({ id: board.id, patch: { is_archived: false } });
+      toast.success("Board restored");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to restore");
+    }
+  };
+
+  const handleToggleStar = async () => {
+    try {
+      await updateMutation.mutateAsync({ id: board.id, patch: { is_starred: !board.is_starred } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update");
+    }
+  };
 
   const locale = locales[i18n.language as keyof typeof locales] ?? enUS;
   const updatedAt = formatDistanceToNow(new Date(board.updated_at), {
@@ -84,33 +113,73 @@ export function BoardCard({ board }: Props) {
                 >
                   {board.name}
                 </Link>
-                <div className="mt-0.5 text-[11.5px] text-white/40">Updated {updatedAt}</div>
+                <div className="mt-0.5 text-[11.5px] text-white/40">{updatedAt}</div>
               </div>
             </div>
 
-            {/* Options menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="rounded-md p-1.5 text-white/35 opacity-0 transition group-hover:opacity-100 hover:bg-white/5 hover:text-white">
-                  {I.More}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="border-white/10 bg-[#13131f] text-white">
-                <DropdownMenuItem
-                  className="cursor-pointer hover:bg-white/[0.05] focus:bg-white/[0.05]"
-                  onClick={() => setRenameOpen(true)}
+            {/* Star + Options */}
+            <div className="flex shrink-0 items-center gap-0.5">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  void handleToggleStar();
+                }}
+                title={board.is_starred ? "Unstar" : "Star board"}
+                className={`rounded-md p-1.5 transition ${
+                  board.is_starred
+                    ? "text-amber-400 opacity-100"
+                    : "text-white/35 opacity-0 group-hover:opacity-100 hover:text-amber-400"
+                }`}
+              >
+                {board.is_starred ? I.StarFilled : I.Star}
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-md p-1.5 text-white/35 opacity-0 transition group-hover:opacity-100 hover:bg-white/5 hover:text-white">
+                    {I.More}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="border-white/10 bg-[#13131f] text-white"
                 >
-                  {t("renameBoard")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem
-                  className="cursor-pointer text-rose-300 focus:bg-rose-500/10 focus:text-rose-200"
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  {t("deleteBoard")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-white/[0.05] focus:bg-white/[0.05]"
+                    onClick={() => void handleToggleStar()}
+                  >
+                    {I.Star}&nbsp; {board.is_starred ? "Unstar" : "Star board"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-white/[0.05] focus:bg-white/[0.05]"
+                    onClick={() => setRenameOpen(true)}
+                  >
+                    {I.Edit}&nbsp; {t("renameBoard")}
+                  </DropdownMenuItem>
+                  {board.is_archived ? (
+                    <DropdownMenuItem
+                      className="cursor-pointer hover:bg-white/[0.05] focus:bg-white/[0.05]"
+                      onClick={() => void handleUnarchive()}
+                    >
+                      {I.Folder}&nbsp; Restore board
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      className="cursor-pointer hover:bg-white/[0.05] focus:bg-white/[0.05]"
+                      onClick={() => void handleArchive()}
+                    >
+                      {I.Folder}&nbsp; Archive board
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator className="bg-white/10" />
+                  <DropdownMenuItem
+                    className="cursor-pointer text-rose-300 focus:bg-rose-500/10 focus:text-rose-200"
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    {I.Trash}&nbsp; {t("deleteBoard")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Mini column preview */}
@@ -140,9 +209,6 @@ export function BoardCard({ board }: Props) {
               ))}
             </div>
           </Link>
-
-          {/* Footer */}
-          <div className="text-[11px] text-white/40">{t("lastUpdated", { date: updatedAt })}</div>
         </div>
       </div>
 

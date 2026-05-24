@@ -33,6 +33,7 @@ export interface Database {
           name: string;
           owner_id: string;
           is_archived: boolean;
+          is_starred: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -41,12 +42,14 @@ export interface Database {
           name: string;
           owner_id: string;
           is_archived?: boolean;
+          is_starred?: boolean;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           name?: string;
           is_archived?: boolean;
+          is_starred?: boolean;
           updated_at?: string;
         };
         Relationships: [];

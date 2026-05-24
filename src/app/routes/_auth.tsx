@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { supabase } from "@/shared/lib/supabase";
+import { pullBoards } from "@/db/syncEngine";
 import { Sidebar } from "../Sidebar";
 
 export const Route = createFileRoute("/_auth")({
@@ -20,6 +22,11 @@ export const Route = createFileRoute("/_auth")({
 
 function AuthLayout() {
   const { user } = Route.useRouteContext();
+
+  // Populate Dexie on first load so search has data
+  useEffect(() => {
+    void pullBoards();
+  }, []);
 
   return (
     <div className="fb-bg flex h-screen overflow-hidden text-white">

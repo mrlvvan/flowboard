@@ -2,19 +2,36 @@ import { useTranslation } from "react-i18next";
 import { I } from "@/shared/ui/icons";
 import { BoardCard } from "./BoardCard";
 import { useBoardsQuery } from "../api/useBoardsQuery";
+import type { Board } from "../types";
 
 type Props = {
   onCreateBoard: () => void;
+  /** When provided, skips the internal query and uses these boards directly */
+  boards?: Board[];
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 };
 
-export function BoardsGrid({ onCreateBoard }: Props) {
+export function BoardsGrid({
+  onCreateBoard,
+  boards: boardsProp,
+  isLoading: isLoadingProp,
+  isError: isErrorProp,
+  onRetry,
+}: Props) {
   const { t } = useTranslation("boards");
-  const { data: boards, isLoading, isError, refetch } = useBoardsQuery();
+  const query = useBoardsQuery();
+
+  // Use provided data or fall back to the internal query
+  const boards = boardsProp ?? query.data;
+  const isLoading = isLoadingProp ?? query.isLoading;
+  const isError = isErrorProp ?? query.isError;
+  const refetch = onRetry ?? (() => void query.refetch());
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Ghost "new board" card */}
         <GhostCard onCreateBoard={onCreateBoard} />
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="fb-glass h-[190px] animate-pulse rounded-2xl" />
@@ -28,7 +45,7 @@ export function BoardsGrid({ onCreateBoard }: Props) {
       <div className="flex flex-col items-center gap-3 py-16 text-white/50">
         <p>Failed to load boards.</p>
         <button
-          onClick={() => void refetch()}
+          onClick={refetch}
           className="text-sm text-violet-300 underline hover:text-violet-200"
         >
           Retry

@@ -510,7 +510,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
               </span>
               <span className="h-3 w-px bg-white/10" />
               <span>
-                Created {dueDate ? format(new Date(card.due_date ?? ""), "MMM d") : "recently"}
+                Created {card.created_at ? format(new Date(card.created_at), "MMM d") : "recently"}
               </span>
             </div>
             <div className="flex items-center gap-2">

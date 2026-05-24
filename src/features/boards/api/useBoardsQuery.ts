@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { boardKeys } from "./keys";
 import { createBoard, deleteBoard, fetchBoards, updateBoard } from "./boardsApi";
 import type { Board } from "../types";
@@ -19,6 +20,9 @@ export function useCreateBoardMutation() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: boardKeys.lists() });
     },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to create board");
+    },
   });
 }
 
@@ -26,14 +30,20 @@ export function useUpdateBoardMutation() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: { name?: string; is_archived?: boolean } }) =>
-      updateBoard(id, patch),
+    mutationFn: ({
+      id,
+      patch,
+    }: {
+      id: string;
+      patch: { name?: string; is_archived?: boolean; is_starred?: boolean };
+    }) => updateBoard(id, patch),
     onMutate: async ({ id, patch }) => {
       await qc.cancelQueries({ queryKey: boardKeys.lists() });
       const prev = qc.getQueriesData<Board[]>({ queryKey: boardKeys.lists() });
 
-      qc.setQueriesData<Board[]>({ queryKey: boardKeys.lists() }, (old) =>
-        old?.map((b) => (b.id === id ? { ...b, ...patch } : b)) ?? []
+      qc.setQueriesData<Board[]>(
+        { queryKey: boardKeys.lists() },
+        (old) => old?.map((b) => (b.id === id ? { ...b, ...patch } : b)) ?? []
       );
 
       return { prev };
@@ -41,8 +51,9 @@ export function useUpdateBoardMutation() {
     onError: (_err, _vars, ctx) => {
       ctx?.prev?.forEach(([key, data]) => qc.setQueryData(key, data));
     },
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
       void qc.invalidateQueries({ queryKey: boardKeys.lists() });
+      void qc.invalidateQueries({ queryKey: boardKeys.detail(id) });
     },
   });
 }
@@ -56,8 +67,9 @@ export function useDeleteBoardMutation() {
       await qc.cancelQueries({ queryKey: boardKeys.lists() });
       const prev = qc.getQueriesData<Board[]>({ queryKey: boardKeys.lists() });
 
-      qc.setQueriesData<Board[]>({ queryKey: boardKeys.lists() }, (old) =>
-        old?.filter((b) => b.id !== id) ?? []
+      qc.setQueriesData<Board[]>(
+        { queryKey: boardKeys.lists() },
+        (old) => old?.filter((b) => b.id !== id) ?? []
       );
 
       return { prev };

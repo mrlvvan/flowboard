@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import type { User } from "@supabase/supabase-js";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
 import {
@@ -16,6 +17,8 @@ import { signOut } from "@/features/auth";
 import { useInstallPrompt } from "@/shared/hooks/useInstallPrompt";
 import { useKeyboardShortcuts } from "@/shared/hooks/useKeyboardShortcuts";
 import { SearchDialog } from "@/features/search/SearchDialog";
+import { useUIStore } from "@/shared/store/uiStore";
+import { KeyboardShortcutsModal } from "./KeyboardShortcutsModal";
 
 type Props = { user: User };
 
@@ -68,19 +71,33 @@ function SidebarBtn({
 
 export function Sidebar({ user }: Props) {
   const navigate = useNavigate();
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+  const { i18n } = useTranslation();
+
   const [createOpen, setCreateOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const { searchOpen, setSearchOpen } = useUIStore();
   const { canInstall, install } = useInstallPrompt();
+
+  const toggleLanguage = () => {
+    void i18n.changeLanguage(i18n.language === "en" ? "ru" : "en");
+  };
 
   useKeyboardShortcuts({
     "/": () => setSearchOpen(true),
     "ctrl+k": () => setSearchOpen(true),
     "meta+k": () => setSearchOpen(true),
     n: () => setCreateOpen(true),
+    "?": () => setShortcutsOpen(true),
   });
 
   const fullName = user.user_metadata["full_name"] as string | undefined;
   const userInitials = initials(fullName, user.email);
+
+  // Route-aware active detection
+  const isBoards = pathname === "/" || pathname === "";
+  const isBoardPage = pathname.startsWith("/board/");
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,11 +117,15 @@ export function Sidebar({ user }: Props) {
           {I.Search}
         </SidebarBtn>
 
-        <SidebarBtn active tip="Boards">
-          <I.Logo size={16} />
+        <SidebarBtn active={isBoards} tip="Boards">
+          <Link to="/" className="grid h-full w-full place-items-center">
+            <I.Logo size={16} />
+          </Link>
         </SidebarBtn>
 
-        <SidebarBtn tip="All boards">{I.Grid}</SidebarBtn>
+        <SidebarBtn active={isBoardPage} tip="All boards">
+          {I.Grid}
+        </SidebarBtn>
 
         <SidebarBtn tip="Starred boards">{I.Star}</SidebarBtn>
 
@@ -137,6 +158,21 @@ export function Sidebar({ user }: Props) {
               {I.Cloud}
             </SidebarBtn>
           )}
+
+          {/* Language toggle */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={toggleLanguage}
+                className="grid h-8 w-8 place-items-center rounded-lg text-[10px] font-bold text-white/45 transition hover:bg-white/[0.05] hover:text-white"
+              >
+                {i18n.language === "ru" ? "RU" : "EN"}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Switch to {i18n.language === "ru" ? "English" : "Russian"}
+            </TooltipContent>
+          </Tooltip>
 
           {/* Theme toggle */}
           <div className="my-1 flex h-[42px] w-10 flex-col gap-0.5 rounded-xl border border-white/[0.06] bg-black/30 p-0.5">
@@ -184,6 +220,7 @@ export function Sidebar({ user }: Props) {
 
       <CreateBoardDialog open={createOpen} onOpenChange={setCreateOpen} />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      <KeyboardShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
     </>
   );
 }

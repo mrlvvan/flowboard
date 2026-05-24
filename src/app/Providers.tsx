@@ -8,8 +8,10 @@ import { TooltipProvider } from "@/shared/ui/tooltip";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60,
+      staleTime: 1000 * 60, // 1 min — don't refetch if data is fresh
+      gcTime: 1000 * 60 * 5, // 5 min — keep unused cache in memory
       retry: 1,
+      refetchOnWindowFocus: false, // avoid jarring refetches when switching tabs
     },
   },
 });

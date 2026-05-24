@@ -3,20 +3,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { UserPlus, Copy, Check } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/shared/ui/dialog";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
+import { I } from "@/shared/ui/icons";
 import { supabase } from "@/shared/lib/supabase";
 
-const schema = z.object({ email: z.string().email() });
+const schema = z.object({ email: z.string().email("Invalid email") });
 type FormData = z.infer<typeof schema>;
 
 type Props = {
@@ -28,25 +19,23 @@ type Props = {
 
 export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Props) {
   const [copied, setCopied] = useState(false);
-  const inviteUrl = `${window.location.origin}/invite/${boardId}`;
+  const inviteUrl = `${window.location.origin}/board/${boardId}`;
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
+    toast.success("Link copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   };
 
   const onSubmit = async (data: FormData) => {
-    // Look up user by email and add as board_member
     const { data: profile, error } = await supabase
       .from("profiles")
       .select("id")
@@ -54,7 +43,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
       .single();
 
     if (error || !profile) {
-      toast.error("User not found. They must sign up first.");
+      toast.error("User not found. They need to sign up first.");
       return;
     }
 
@@ -63,51 +52,107 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
       .insert({ board_id: boardId, user_id: profile.id, role: "editor" });
 
     if (memberError) {
-      toast.error(memberError.message);
+      if (memberError.code === "23505") {
+        toast.error("This user already has access to the board.");
+      } else {
+        toast.error(memberError.message);
+      }
       return;
     }
 
-    toast.success(`Invited ${data.email}`);
+    toast.success(`${data.email} can now access this board`);
     reset();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Share &ldquo;{boardName}&rdquo;
-          </DialogTitle>
-          <DialogDescription>Invite people to collaborate on this board.</DialogDescription>
+      <DialogContent className="max-w-[480px] border-0 bg-transparent p-0 shadow-none">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Share board</DialogTitle>
         </DialogHeader>
-
-        <div className="space-y-4">
-          {/* Invite by email */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-            <Label>Invite by email</Label>
-            <div className="flex gap-2">
-              <Input type="email" placeholder="colleague@example.com" {...register("email")} />
-              <Button type="submit" disabled={isSubmitting}>
-                Invite
-              </Button>
+        <div
+          className="fb-glass-strong fb-ring-inner overflow-hidden rounded-2xl"
+          style={{
+            boxShadow: "0 25px 60px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(139,92,246,0.12)",
+          }}
+        >
+          <div className="h-[3px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500" />
+          <div className="px-6 pt-5 pb-6">
+            {/* Header */}
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-[16px] font-semibold text-white">
+                  Share &ldquo;{boardName}&rdquo;
+                </h2>
+                <p className="mt-0.5 text-[12.5px] text-white/45">Invite people to collaborate</p>
+              </div>
+              <button
+                onClick={() => onOpenChange(false)}
+                className="grid h-7 w-7 place-items-center rounded-lg text-white/40 transition hover:bg-white/[0.06] hover:text-white"
+              >
+                {I.X}
+              </button>
             </div>
-            {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
-          </form>
 
-          {/* Copy link */}
-          <div className="space-y-2">
-            <Label>Or share link</Label>
-            <div className="flex gap-2">
-              <Input value={inviteUrl} readOnly className="text-muted-foreground text-xs" />
-              <Button variant="outline" size="icon" onClick={() => void copyLink()}>
-                {copied ? (
-                  <Check className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
+            {/* Invite by email */}
+            <form onSubmit={handleSubmit(onSubmit)} className="mb-5">
+              <span className="mb-2 block text-[11.5px] font-medium tracking-[0.06em] text-white/55 uppercase">
+                Invite by email
+              </span>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute top-1/2 left-3 -translate-y-1/2 text-white/35">
+                    {I.Mail}
+                  </span>
+                  <input
+                    type="email"
+                    placeholder="colleague@example.com"
+                    {...register("email")}
+                    className="fb-input h-10 w-full rounded-xl pr-3 pl-9 text-[13.5px]"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="fb-grad-btn h-10 rounded-xl px-4 text-[13.5px] font-semibold text-white disabled:opacity-60"
+                >
+                  {isSubmitting ? "…" : "Invite"}
+                </button>
+              </div>
+              {errors.email && (
+                <p className="mt-1.5 text-[12px] text-rose-400">{errors.email.message}</p>
+              )}
+            </form>
+
+            {/* Divider */}
+            <div className="mb-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/[0.06]" />
+              <span className="text-[11px] text-white/35">or share link</span>
+              <div className="h-px flex-1 bg-white/[0.06]" />
             </div>
+
+            {/* Copy link */}
+            <div className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-black/30 px-3 py-2">
+              <span className="flex-1 truncate font-mono text-[12px] text-white/50">
+                {inviteUrl}
+              </span>
+              <button
+                onClick={() => void copyLink()}
+                className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition ${
+                  copied
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-white/[0.06] text-white/70 hover:bg-white/[0.1] hover:text-white"
+                }`}
+              >
+                {copied ? I.Check : I.Share}
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+
+            {/* Role note */}
+            <p className="mt-3 text-[11.5px] text-white/35">
+              Invited members get <span className="text-white/55">editor</span> access by default.
+            </p>
           </div>
         </div>
       </DialogContent>

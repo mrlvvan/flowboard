@@ -135,6 +135,43 @@ export function KanbanBoard({ boardId }: Props) {
     );
   }
 
+  // Empty board state — no columns yet
+  if (!colLoading && columns.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <div className="max-w-sm text-center">
+          <div
+            className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl"
+            style={{
+              background: "rgba(99,102,241,0.1)",
+              boxShadow: "inset 0 0 0 1px rgba(99,102,241,0.2)",
+            }}
+          >
+            {I.Plus}
+          </div>
+          <h2 className="mb-2 text-[18px] font-semibold tracking-tight text-white">
+            Add your first column
+          </h2>
+          <p className="mb-6 text-[13.5px] leading-relaxed text-white/50">
+            Columns help you organize work by status. Try &ldquo;To Do&rdquo;, &ldquo;In
+            Progress&rdquo;, &ldquo;Done&rdquo;.
+          </p>
+          {/* Quick-start button scrolls to the Add column button */}
+          <button
+            onClick={() => {
+              // Trigger the Add column input at the end of the board
+              const btn = document.querySelector<HTMLButtonElement>("[data-add-column]");
+              btn?.click();
+            }}
+            className="fb-grad-btn inline-flex h-10 items-center gap-2 rounded-xl px-5 text-[14px] font-semibold text-white"
+          >
+            {I.Plus} Add column
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -190,6 +227,7 @@ export function KanbanBoard({ boardId }: Props) {
             </div>
           ) : (
             <button
+              data-add-column
               onClick={() => setAddingColumn(true)}
               className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-white/[0.08] py-3 text-[13px] font-medium text-white/50 transition hover:border-violet-400/40 hover:bg-white/[0.02] hover:text-white"
             >

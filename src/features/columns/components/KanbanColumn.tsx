@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
@@ -51,6 +52,7 @@ export function KanbanColumn({
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(column.name);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [addingCard, setAddingCard] = useState(false);
 
   const color = COL_COLORS[colorIndex % COL_COLORS.length] ?? "#64748b";
 
@@ -138,9 +140,8 @@ export function KanbanColumn({
           <div className="-mr-1 flex items-center">
             <button
               className="rounded-md p-1.5 text-white/40 transition hover:bg-white/[0.05] hover:text-white"
-              onClick={() => {
-                /* add card */
-              }}
+              onClick={() => setAddingCard(true)}
+              title="Add card"
             >
               {I.Plus}
             </button>
@@ -178,13 +179,21 @@ export function KanbanColumn({
           className="fb-scroll flex flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2"
         >
           <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-            {cards.map((card) => (
-              <CardItem key={card.id} card={card} onOpen={setSelectedCard} />
-            ))}
+            <AnimatePresence initial={false}>
+              {cards.map((card) => (
+                <CardItem key={card.id} card={card} onOpen={setSelectedCard} />
+              ))}
+            </AnimatePresence>
           </SortableContext>
 
           {/* Add card inline */}
-          <InlineAddCard boardId={boardId} columnId={column.id} lastPosition={lastPosition} />
+          <InlineAddCard
+            boardId={boardId}
+            columnId={column.id}
+            lastPosition={lastPosition}
+            forceOpen={addingCard}
+            onForceOpenHandled={() => setAddingCard(false)}
+          />
         </div>
       </div>
 

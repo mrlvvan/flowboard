@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { isToday, isPast } from "date-fns";
+import { isToday, isPast, isBefore, addDays } from "date-fns";
 import { motion } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 import { I } from "@/shared/ui/icons";
@@ -38,7 +38,13 @@ export function CardItem({ card, onOpen }: Props) {
   };
 
   const dueDate = card.due_date ? new Date(card.due_date) : null;
-  const dueTone = dueDate && (isToday(dueDate) || isPast(dueDate)) ? "red" : "default";
+  const dueTone = dueDate
+    ? isToday(dueDate) || isPast(dueDate)
+      ? "red"
+      : isBefore(dueDate, addDays(new Date(), 3))
+        ? "amber"
+        : "default"
+    : "default";
 
   const hasChecklist = card.description?.includes("- [") ?? false;
   const hasMeta = dueDate || hasChecklist;
@@ -112,7 +118,9 @@ export function CardItem({ card, onOpen }: Props) {
                 "inline-flex items-center gap-1 text-[11px] font-medium",
                 dueTone === "red"
                   ? "rounded-md border border-rose-500/15 bg-rose-500/10 px-1.5 py-[2px] text-rose-300"
-                  : "text-white/50"
+                  : dueTone === "amber"
+                    ? "rounded-md border border-amber-500/15 bg-amber-500/10 px-1.5 py-[2px] text-amber-300"
+                    : "text-white/50"
               )}
             >
               {I.Calendar}

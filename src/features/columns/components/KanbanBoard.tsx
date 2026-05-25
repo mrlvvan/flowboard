@@ -32,11 +32,46 @@ import { KanbanColumn } from "./KanbanColumn";
 import type { Column } from "../api/columnsApi";
 import type { Card } from "@/features/cards/api/cardsApi";
 
-type Props = { boardId: string };
+type Props = {
+  boardId: string;
+  filterLabels?: string[];
+  filterOverdue?: boolean;
+  filterDueSoon?: boolean;
+};
 
-export function KanbanBoard({ boardId }: Props) {
+function applyCardFilters(
+  cards: Card[],
+  labels?: string[],
+  overdue?: boolean,
+  dueSoon?: boolean
+): Card[] {
+  const now = Date.now();
+  const threeDays = 3 * 24 * 60 * 60 * 1000;
+  return cards.filter((c) => {
+    if (labels?.length) {
+      if (!labels.some((l) => c.labels.includes(l))) return false;
+    }
+    if (overdue) {
+      if (!c.due_date) return false;
+      if (new Date(c.due_date).getTime() >= now) return false;
+    }
+    if (dueSoon) {
+      if (!c.due_date) return false;
+      const t = new Date(c.due_date).getTime();
+      if (t < now || t > now + threeDays) return false;
+    }
+    return true;
+  });
+}
+
+export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoon }: Props) {
   const { data: columns = [], isLoading: colLoading } = useColumnsQuery(boardId);
-  const { data: cards = [], isLoading: cardLoading } = useCardsQuery(boardId);
+  const { data: rawCards = [], isLoading: cardLoading } = useCardsQuery(boardId);
+
+  const hasFilters = !!(filterLabels?.length || filterOverdue || filterDueSoon);
+  const cards = hasFilters
+    ? applyCardFilters(rawCards, filterLabels, filterOverdue, filterDueSoon)
+    : rawCards;
 
   const createColumn = useCreateColumnMutation(boardId);
   const updateColumn = useUpdateColumnMutation(boardId);
@@ -53,8 +88,15 @@ export function KanbanBoard({ boardId }: Props) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Filtered cards for display
   const cardsForColumn = (colId: string) =>
     cards.filter((c) => c.column_id === colId).sort((a, b) => a.position.localeCompare(b.position));
+
+  // Unfiltered cards for DnD position calculation
+  const rawCardsForColumn = (colId: string) =>
+    rawCards
+      .filter((c) => c.column_id === colId)
+      .sort((a, b) => a.position.localeCompare(b.position));
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
@@ -104,7 +146,7 @@ export function KanbanBoard({ boardId }: Props) {
     if (activeData?.type === "card" && overData?.type === "card") {
       const activeCardData = activeData.card as Card;
       const overCard = overData.card as Card;
-      const targetColumnCards = cardsForColumn(overCard.column_id);
+      const targetColumnCards = rawCardsForColumn(overCard.column_id);
       const overIndex = targetColumnCards.findIndex((c) => c.id === overCard.id);
       const prev = targetColumnCards[overIndex - 1]?.position;
       const next = targetColumnCards[overIndex]?.position;

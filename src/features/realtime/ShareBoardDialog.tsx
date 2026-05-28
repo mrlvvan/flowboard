@@ -36,13 +36,18 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
   };
 
   const onSubmit = async (data: FormData) => {
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", data.email)
-      .single();
+    // Use SECURITY DEFINER RPC — RLS hides profiles of users you don't share a board with
+    const { data: matches, error: lookupError } = await supabase.rpc("find_user_by_email", {
+      p_email: data.email,
+    });
 
-    if (error || !profile) {
+    if (lookupError) {
+      toast.error(lookupError.message);
+      return;
+    }
+
+    const profile = Array.isArray(matches) ? matches[0] : null;
+    if (!profile) {
       toast.error("User not found. They need to sign up first.");
       return;
     }

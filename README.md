@@ -130,11 +130,19 @@ pnpm install
 
 # 2. Configure environment
 cp .env.example .env.local
-# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from
+# Supabase Dashboard → Project Settings → API
+```
 
-# 3. Apply database migrations
-pnpm supabase db push
+**3. Set up the database** — open Supabase Dashboard → **SQL Editor** → **New query** →
+paste the contents of [`supabase/SETUP.sql`](supabase/SETUP.sql) → **Run**.
 
+The script is fully idempotent (safe to re-run) and bundles every migration:
+tables, indexes, RLS policies, triggers, Realtime publication, avatars bucket,
+and an invite-by-email RPC. See [`supabase/README.md`](supabase/README.md) for details
+and the Supabase CLI alternative.
+
+```bash
 # 4. Dev server
 pnpm dev
 ```

@@ -159,7 +159,25 @@ export interface Database {
       };
     };
     Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Functions: {
+      find_user_by_email: {
+        Args: { p_email: string };
+        Returns: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          avatar_url: string | null;
+        }[];
+      };
+      is_board_member: {
+        Args: { p_board_id: string };
+        Returns: boolean;
+      };
+      board_role: {
+        Args: { p_board_id: string };
+        Returns: string | null;
+      };
+    };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
   };

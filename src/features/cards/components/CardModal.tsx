@@ -5,7 +5,9 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/shared/ui/dialog";
 import { I } from "@/shared/ui/icons";
-import { useUpdateCardMutation, useDeleteCardMutation } from "../api/useCardsQuery";
+import { useUpdateCardMutation } from "../api/useCardsQuery";
+import { CardComments } from "@/features/comments";
+import { useCardCommands } from "@/shared/commands/useCardCommands";
 import type { Card } from "../api/cardsApi";
 
 // ── Label colours ──────────────────────────────────────────────────────
@@ -87,7 +89,7 @@ type Props = {
 // ── Component ─────────────────────────────────────────────────────────
 export function CardModal({ card, boardId, open, onOpenChange }: Props) {
   const updateMutation = useUpdateCardMutation(boardId);
-  const deleteMutation = useDeleteCardMutation(boardId);
+  const { deleteCardUndoable } = useCardCommands(boardId);
 
   const [title, setTitle] = useState(card.title);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -140,9 +142,11 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
   };
 
   const handleDelete = async () => {
-    await deleteMutation.mutateAsync(card.id);
     onOpenChange(false);
-    toast.success("Card deleted");
+    await deleteCardUndoable(card);
+    toast.success(`Card deleted`, {
+      description: "Press ⌘Z to undo",
+    });
   };
 
   const doneCount = checklist.filter((i) => i.done).length;
@@ -402,6 +406,9 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                   </div>
                 </section>
               )}
+
+              {/* Comments */}
+              <CardComments cardId={card.id} boardId={boardId} />
             </div>
 
             {/* Sidebar */}

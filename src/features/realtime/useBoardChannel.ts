@@ -5,6 +5,7 @@ import { supabase } from "@/shared/lib/supabase";
 import { boardKeys } from "@/features/boards/api/keys";
 import { columnKeys } from "@/features/columns/api/keys";
 import { cardKeys } from "@/features/cards/api/keys";
+import { commentKeys } from "@/features/comments/api/useCommentsQuery";
 
 /**
  * Subscribes to Supabase Realtime for a board and invalidates
@@ -34,6 +35,22 @@ export function useBoardChannel(boardId: string) {
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "boards", filter: `id=eq.${boardId}` },
         () => void qc.invalidateQueries({ queryKey: boardKeys.detail(boardId) })
+      )
+      // Comments — invalidate per-card lists (cheap: card_id is in the payload)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "card_comments",
+          filter: `board_id=eq.${boardId}`,
+        },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { card_id?: string } | null;
+          if (row?.card_id) {
+            void qc.invalidateQueries({ queryKey: commentKeys.forCard(row.card_id) });
+          }
+        }
       )
       .subscribe();
 

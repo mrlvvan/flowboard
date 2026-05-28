@@ -21,7 +21,13 @@ type Props = { children: ReactNode };
 export function Providers({ children }: Props) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        forcedTheme="dark"
+        enableSystem={false}
+        disableTransitionOnChange
+      >
         <TooltipProvider>
           {children}
           <Toaster richColors closeButton />

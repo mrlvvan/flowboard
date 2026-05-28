@@ -19,6 +19,13 @@ const SHORTCUTS = [
       { keys: ["Enter"], description: "Save inline edit" },
     ],
   },
+  {
+    section: "Edit history",
+    items: [
+      { keys: ["⌘", "Z"], description: "Undo last action" },
+      { keys: ["⌘", "⇧", "Z"], description: "Redo" },
+    ],
+  },
 ];
 
 function Kbd({ children }: { children: string }) {

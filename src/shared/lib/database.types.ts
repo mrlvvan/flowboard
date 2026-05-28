@@ -132,6 +132,31 @@ export interface Database {
         };
         Relationships: [];
       };
+      card_comments: {
+        Row: {
+          id: string;
+          card_id: string;
+          board_id: string;
+          author_id: string;
+          body: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          card_id: string;
+          board_id: string;
+          author_id: string;
+          body: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          body?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<never, never>;
     Functions: Record<never, never>;

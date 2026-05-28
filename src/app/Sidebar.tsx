@@ -18,6 +18,7 @@ import { useInstallPrompt } from "@/shared/hooks/useInstallPrompt";
 import { useKeyboardShortcuts } from "@/shared/hooks/useKeyboardShortcuts";
 import { SearchDialog } from "@/features/search/SearchDialog";
 import { useUIStore } from "@/shared/store/uiStore";
+import { useCommandHistory } from "@/shared/commands/commandHistory";
 import { KeyboardShortcutsModal } from "./KeyboardShortcutsModal";
 
 type Props = { user: User };
@@ -79,6 +80,8 @@ export function Sidebar({ user }: Props) {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const { searchOpen, setSearchOpen } = useUIStore();
   const { canInstall, install } = useInstallPrompt();
+  const undo = useCommandHistory((s) => s.undo);
+  const redo = useCommandHistory((s) => s.redo);
 
   const toggleLanguage = () => {
     void i18n.changeLanguage(i18n.language === "en" ? "ru" : "en");
@@ -90,6 +93,10 @@ export function Sidebar({ user }: Props) {
     "meta+k": () => setSearchOpen(true),
     n: () => setCreateOpen(true),
     "?": () => setShortcutsOpen(true),
+    "ctrl+z": () => void undo(),
+    "meta+z": () => void undo(),
+    "ctrl+shift+z": () => void redo(),
+    "meta+shift+z": () => void redo(),
   });
 
   const fullName = user.user_metadata["full_name"] as string | undefined;
@@ -174,15 +181,19 @@ export function Sidebar({ user }: Props) {
             </TooltipContent>
           </Tooltip>
 
-          {/* Theme toggle */}
-          <div className="my-1 flex h-[42px] w-10 flex-col gap-0.5 rounded-xl border border-white/[0.06] bg-black/30 p-0.5">
-            <button className="grid flex-1 place-items-center rounded-md bg-white/[0.08] text-white">
-              {I.Moon}
-            </button>
-            <button className="grid flex-1 place-items-center rounded-md text-white/30">
-              {I.Sun}
-            </button>
-          </div>
+          {/* Help / keyboard shortcuts */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setShortcutsOpen(true)}
+                className="grid h-8 w-8 place-items-center rounded-lg text-white/45 transition hover:bg-white/[0.05] hover:text-white"
+                aria-label="Keyboard shortcuts"
+              >
+                <span className="text-[13px] font-bold">?</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Keyboard shortcuts (?)</TooltipContent>
+          </Tooltip>
 
           {/* User avatar / menu */}
           <DropdownMenu>

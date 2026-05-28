@@ -119,3 +119,35 @@ export async function deleteCard(id: string): Promise<void> {
   const { error } = await supabase.from("cards").delete().eq("id", id);
   if (error) throw error;
 }
+
+/**
+ * Re-create a card from a previous snapshot — used by undo after delete.
+ * Preserves the original UUID so existing references (e.g. comments) stay valid.
+ */
+export async function restoreCard(card: Card): Promise<Card> {
+  await db.cards.put(card);
+
+  if (!navigator.onLine) {
+    await enqueue("cards", "create", card.id, card);
+    return card;
+  }
+
+  const { data, error } = await supabase
+    .from("cards")
+    .insert({
+      id: card.id,
+      board_id: card.board_id,
+      column_id: card.column_id,
+      title: card.title,
+      position: card.position,
+      description: card.description,
+      due_date: card.due_date,
+      labels: card.labels,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await db.cards.put(data);
+  return data;
+}

@@ -180,39 +180,7 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
     );
   }
 
-  // Empty board state — no columns yet
-  if (!colLoading && columns.length === 0) {
-    return (
-      <div className="flex h-full items-center justify-center p-8">
-        <div className="max-w-sm text-center">
-          <div
-            className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl"
-            style={{
-              background: "rgba(99,102,241,0.1)",
-              boxShadow: "inset 0 0 0 1px rgba(99,102,241,0.2)",
-            }}
-          >
-            {I.Plus}
-          </div>
-          <h2 className="mb-2 text-[18px] font-semibold tracking-tight text-white">
-            {t("addFirstColumn")}
-          </h2>
-          <p className="mb-6 text-[13.5px] leading-relaxed text-white/50">{t("firstColumnHint")}</p>
-          {/* Quick-start button scrolls to the Add column button */}
-          <button
-            onClick={() => {
-              // Trigger the Add column input at the end of the board
-              const btn = document.querySelector<HTMLButtonElement>("[data-add-column]");
-              btn?.click();
-            }}
-            className="fb-grad-btn inline-flex h-10 items-center gap-2 rounded-xl px-5 text-[14px] font-semibold text-white"
-          >
-            {I.Plus} {t("addColumn")}
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const isEmpty = !colLoading && columns.length === 0;
 
   return (
     <DndContext
@@ -223,6 +191,35 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
       onDragEnd={handleDragEnd}
     >
       <div className="fb-scroll flex h-full gap-4 overflow-x-auto p-6 pb-8">
+        {/* Empty board hint — sits to the left of the always-rendered Add column form */}
+        {isEmpty && !addingColumn && (
+          <div className="flex shrink-0 items-center self-stretch pr-4 pl-2">
+            <div className="max-w-sm text-center">
+              <div
+                className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl"
+                style={{
+                  background: "rgba(99,102,241,0.1)",
+                  boxShadow: "inset 0 0 0 1px rgba(99,102,241,0.2)",
+                }}
+              >
+                {I.Plus}
+              </div>
+              <h2 className="mb-2 text-[16px] font-semibold tracking-tight text-white">
+                {t("addFirstColumn")}
+              </h2>
+              <p className="mb-5 text-[13px] leading-relaxed text-white/50">
+                {t("firstColumnHint")}
+              </p>
+              <button
+                onClick={() => setAddingColumn(true)}
+                className="fb-grad-btn inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[13.5px] font-semibold text-white"
+              >
+                {I.Plus} {t("addColumn")}
+              </button>
+            </div>
+          </div>
+        )}
+
         <SortableContext items={columns.map((c) => c.id)} strategy={horizontalListSortingStrategy}>
           {columns.map((col, idx) => (
             <KanbanColumn

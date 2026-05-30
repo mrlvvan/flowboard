@@ -10,5 +10,22 @@
   "retry": "Retry",
   "confirm": "Confirm",
   "back": "Back",
-  "or": "or"
+  "or": "or",
+  "search": "Search",
+  "filter": "Filter",
+  "view": "View",
+  "share": "Share",
+  "workspace": "Workspace",
+  "private": "Private",
+  "all": "All",
+  "starred": "Starred",
+  "recent": "Recent",
+  "archived": "Archived",
+  "add": "Add",
+  "posting": "Posting…",
+  "saving": "Saving…",
+  "esc": "Esc",
+  "close": "close",
+  "open": "open",
+  "navigate": "navigate"
 }

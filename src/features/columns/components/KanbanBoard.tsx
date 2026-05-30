@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   DragOverlay,
@@ -65,6 +66,8 @@ function applyCardFilters(
 }
 
 export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoon }: Props) {
+  const { t } = useTranslation("cards");
+  const { t: tc } = useTranslation("common");
   const { data: columns = [], isLoading: colLoading } = useColumnsQuery(boardId);
   const { data: rawCards = [], isLoading: cardLoading } = useCardsQuery(boardId);
 
@@ -192,12 +195,9 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
             {I.Plus}
           </div>
           <h2 className="mb-2 text-[18px] font-semibold tracking-tight text-white">
-            Add your first column
+            {t("addFirstColumn")}
           </h2>
-          <p className="mb-6 text-[13.5px] leading-relaxed text-white/50">
-            Columns help you organize work by status. Try &ldquo;To Do&rdquo;, &ldquo;In
-            Progress&rdquo;, &ldquo;Done&rdquo;.
-          </p>
+          <p className="mb-6 text-[13.5px] leading-relaxed text-white/50">{t("firstColumnHint")}</p>
           {/* Quick-start button scrolls to the Add column button */}
           <button
             onClick={() => {
@@ -207,7 +207,7 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
             }}
             className="fb-grad-btn inline-flex h-10 items-center gap-2 rounded-xl px-5 text-[14px] font-semibold text-white"
           >
-            {I.Plus} Add column
+            {I.Plus} {t("addColumn")}
           </button>
         </div>
       </div>
@@ -244,7 +244,7 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
               <Input
                 value={newColName}
                 onChange={(e) => setNewColName(e.target.value)}
-                placeholder="Column name…"
+                placeholder={t("columnNamePlaceholder")}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") void addColumn();
                   if (e.key === "Escape") setAddingColumn(false);
@@ -257,13 +257,13 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
                   onClick={() => void addColumn()}
                   className="fb-grad-btn h-8 rounded-lg px-3 text-[13px] font-medium text-white"
                 >
-                  Add column
+                  {t("addColumn")}
                 </button>
                 <button
                   onClick={() => setAddingColumn(false)}
                   className="h-8 rounded-lg px-3 text-[13px] text-white/50 transition hover:bg-white/[0.05] hover:text-white"
                 >
-                  Cancel
+                  {tc("cancel")}
                 </button>
               </div>
             </div>
@@ -273,7 +273,7 @@ export function KanbanBoard({ boardId, filterLabels, filterOverdue, filterDueSoo
               onClick={() => setAddingColumn(true)}
               className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-white/[0.08] py-3 text-[13px] font-medium text-white/50 transition hover:border-violet-400/40 hover:bg-white/[0.02] hover:text-white"
             >
-              {I.Plus} Add column
+              {I.Plus} {t("addColumn")}
             </button>
           )}
         </div>

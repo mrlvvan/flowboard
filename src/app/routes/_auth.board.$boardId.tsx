@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/shared/lib/supabase";
@@ -81,6 +82,7 @@ function FilterPanel({
   onToggleDueSoon: () => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation("cards");
   const hasFilters = activeLabels.length > 0 || overdue || dueSoon;
   return (
     <div
@@ -90,7 +92,7 @@ function FilterPanel({
       {/* Labels */}
       <div className="mb-4">
         <div className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-          Labels
+          {t("filterLabels")}
         </div>
         <div className="flex flex-wrap gap-1.5">
           {ALL_LABELS.map((label) => {
@@ -123,7 +125,7 @@ function FilterPanel({
       {/* Due date */}
       <div className="mb-4">
         <div className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-          Due date
+          {t("filterDueDate")}
         </div>
         <div className="flex gap-2">
           <button
@@ -134,7 +136,7 @@ function FilterPanel({
                 : "bg-white/[0.04] text-white/55 hover:bg-white/[0.07]"
             }`}
           >
-            Overdue
+            {t("overdue")}
           </button>
           <button
             onClick={onToggleDueSoon}
@@ -144,7 +146,7 @@ function FilterPanel({
                 : "bg-white/[0.04] text-white/55 hover:bg-white/[0.07]"
             }`}
           >
-            Due in 3 days
+            {t("dueSoon")}
           </button>
         </div>
       </div>
@@ -155,16 +157,20 @@ function FilterPanel({
           onClick={onClear}
           className="w-full rounded-lg py-1.5 text-[12px] text-white/40 transition hover:bg-white/[0.04] hover:text-white/70"
         >
-          Clear all filters
+          {t("filterClearAll")}
         </button>
       )}
-      {!hasFilters && <p className="text-center text-[11.5px] text-white/25">No filters active</p>}
+      {!hasFilters && (
+        <p className="text-center text-[11.5px] text-white/25">{t("filterNoActive")}</p>
+      )}
     </div>
   );
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 function BoardPage() {
+  const { t } = useTranslation("cards");
+  const { t: tc } = useTranslation("common");
   const { boardId } = Route.useParams();
   const { user } = Route.useRouteContext();
   const search = Route.useSearch();
@@ -318,7 +324,7 @@ function BoardPage() {
             )}
 
             <span className="ml-1 shrink-0 rounded-md bg-white/[0.05] px-1.5 py-0.5 text-[11px] text-white/45">
-              Private
+              {tc("private")}
             </span>
           </div>
         </div>
@@ -337,7 +343,7 @@ function BoardPage() {
                   : "text-white/65 hover:bg-white/[0.05] hover:text-white"
               }`}
             >
-              {I.Filter} Filter
+              {I.Filter} {tc("filter")}
               {filterCount > 0 && (
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-violet-500 text-[10px] font-bold text-white">
                   {filterCount}
@@ -359,13 +365,13 @@ function BoardPage() {
           </div>
 
           <button className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-[12.5px] text-white/65 transition hover:bg-white/[0.05] hover:text-white">
-            {I.Eye} View
+            {I.Eye} {tc("view")}
           </button>
           <button
             onClick={() => setShareOpen(true)}
             className="fb-grad-btn flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium text-white"
           >
-            {I.Share} Share
+            {I.Share} {tc("share")}
           </button>
         </div>
       </header>
@@ -373,7 +379,7 @@ function BoardPage() {
       {/* Active filter chips */}
       {filterCount > 0 && (
         <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.04] px-7 py-2">
-          <span className="text-[11.5px] text-white/40">Filtered by:</span>
+          <span className="text-[11.5px] text-white/40">{t("filteredBy")}</span>
           {activeLabels.map((label) => {
             const hex = LABEL_HEX[label];
             return (
@@ -398,7 +404,7 @@ function BoardPage() {
               onClick={toggleOverdue}
               className="flex items-center gap-1 rounded-md bg-rose-500/20 px-2 py-0.5 text-[11.5px] font-medium text-rose-300 transition hover:opacity-70"
             >
-              Overdue <span className="opacity-60">×</span>
+              {t("overdue")} <span className="opacity-60">×</span>
             </button>
           )}
           {dueSoonFilter && (
@@ -406,14 +412,14 @@ function BoardPage() {
               onClick={toggleDueSoon}
               className="flex items-center gap-1 rounded-md bg-amber-500/20 px-2 py-0.5 text-[11.5px] font-medium text-amber-300 transition hover:opacity-70"
             >
-              Due in 3 days <span className="opacity-60">×</span>
+              {t("dueSoon")} <span className="opacity-60">×</span>
             </button>
           )}
           <button
             onClick={clearFilters}
             className="ml-1 text-[11px] text-white/30 transition hover:text-white/60"
           >
-            Clear all
+            {t("filterClearShort")}
           </button>
         </div>
       )}

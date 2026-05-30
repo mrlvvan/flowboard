@@ -22,6 +22,7 @@ function isDbMissingError(err: unknown): boolean {
 
 function BoardsPage() {
   const { t } = useTranslation("boards");
+  const { t: tc } = useTranslation("common");
   const { user } = AuthRoute.useRouteContext();
   const setSearchOpen = useUIStore((s) => s.setSearchOpen);
 
@@ -67,7 +68,7 @@ function BoardsPage() {
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-white/[0.04] px-8">
         <div>
           <div className="text-[11px] font-medium tracking-[0.14em] text-white/40 uppercase">
-            Workspace
+            {tc("workspace")}
           </div>
           <div className="mt-0.5 flex items-center gap-2">
             <h1 className="text-[18px] font-semibold tracking-tight">{workspaceName}</h1>
@@ -81,7 +82,7 @@ function BoardsPage() {
             className="relative flex h-9 w-72 items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-3 text-[13px] text-white/35 transition hover:border-white/[0.14] hover:text-white/50"
           >
             <span className="shrink-0">{I.Search}</span>
-            <span className="flex-1 text-left">Search boards, cards, members…</span>
+            <span className="flex-1 text-left">{tc("search")}…</span>
             <kbd className="shrink-0 rounded border border-white/[0.06] bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-white/40">
               ⌘K
             </kbd>
@@ -114,7 +115,7 @@ function BoardsPage() {
                   tab === label ? "bg-white/[0.08] text-white" : "text-white/50 hover:text-white"
                 }`}
               >
-                {label}
+                {tc(label.toLowerCase())}
               </button>
             ))}
           </div>

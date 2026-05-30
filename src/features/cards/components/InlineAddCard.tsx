@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { I } from "@/shared/ui/icons";
 import { useCreateCardMutation } from "../api/useCardsQuery";
 
@@ -18,6 +19,7 @@ export function InlineAddCard({
   forceOpen,
   onForceOpenHandled,
 }: Props) {
+  const { t } = useTranslation("cards");
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -62,7 +64,7 @@ export function InlineAddCard({
         onClick={() => setOpen(true)}
         className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] text-white/40 transition hover:bg-white/[0.04] hover:text-white/85"
       >
-        <span className="text-white/35">{I.Plus}</span> Add a card
+        <span className="text-white/35">{I.Plus}</span> {t("addCard")}
       </button>
     );
   }
@@ -74,7 +76,7 @@ export function InlineAddCard({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Card title… (Enter to add, Shift+Enter for new line)"
+        placeholder={t("cardTitlePlaceholder")}
         rows={2}
         className="fb-input w-full resize-none rounded-xl p-2.5 text-[13px]"
       />
@@ -84,7 +86,7 @@ export function InlineAddCard({
           disabled={mutation.isPending || !title.trim()}
           className="fb-grad-btn h-8 rounded-lg px-3 text-[12.5px] font-medium text-white disabled:opacity-60"
         >
-          {mutation.isPending ? "Adding…" : "Add card"}
+          {mutation.isPending ? t("addingCard") : t("addCardBtn")}
         </button>
         <button
           onClick={() => {

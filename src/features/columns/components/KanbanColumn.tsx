@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AnimatePresence } from "framer-motion";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -49,6 +50,7 @@ export function KanbanColumn({
   onRename,
   onDelete,
 }: Props) {
+  const { t } = useTranslation("cards");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(column.name);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -141,7 +143,7 @@ export function KanbanColumn({
             <button
               className="rounded-md p-1.5 text-white/40 transition hover:bg-white/[0.05] hover:text-white"
               onClick={() => setAddingCard(true)}
-              title="Add card"
+              title={t("addCard")}
             >
               {I.Plus}
             </button>
@@ -159,14 +161,14 @@ export function KanbanColumn({
                     setNameInput(column.name);
                   }}
                 >
-                  Rename column
+                  {t("renameColumn")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
                   className="cursor-pointer text-rose-300 focus:bg-rose-500/10 focus:text-rose-200"
                   onClick={() => onDelete(column.id)}
                 >
-                  Delete column
+                  {t("deleteColumn")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

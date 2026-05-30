@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { columnKeys } from "./keys";
+import { formatSupabaseError } from "@/shared/lib/supabaseError";
 import { createColumn, deleteColumn, fetchColumns, updateColumn, type Column } from "./columnsApi";
 
 export function useColumnsQuery(boardId: string) {
@@ -17,7 +18,8 @@ export function useCreateColumnMutation(boardId: string) {
       createColumn(boardId, name, afterPosition),
     onSuccess: () => void qc.invalidateQueries({ queryKey: columnKeys.byBoard(boardId) }),
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "Failed to create column");
+      console.error("[createColumn] failed", err);
+      toast.error(formatSupabaseError(err, "Create column"), { duration: 8000 });
     },
   });
 }
@@ -39,8 +41,10 @@ export function useUpdateColumnMutation(boardId: string) {
       );
       return { prev };
     },
-    onError: (_err, _vars, ctx) => {
+    onError: (err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(columnKeys.byBoard(boardId), ctx.prev);
+      console.error("[updateColumn] failed", err);
+      toast.error(formatSupabaseError(err, "Update column"), { duration: 8000 });
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: columnKeys.byBoard(boardId) }),
   });
@@ -59,8 +63,10 @@ export function useDeleteColumnMutation(boardId: string) {
       );
       return { prev };
     },
-    onError: (_err, _vars, ctx) => {
+    onError: (err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(columnKeys.byBoard(boardId), ctx.prev);
+      console.error("[deleteColumn] failed", err);
+      toast.error(formatSupabaseError(err, "Delete column"), { duration: 8000 });
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: columnKeys.byBoard(boardId) }),
   });

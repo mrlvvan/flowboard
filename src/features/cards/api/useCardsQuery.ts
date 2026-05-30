@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cardKeys } from "./keys";
+import { formatSupabaseError } from "@/shared/lib/supabaseError";
 import { createCard, deleteCard, fetchCards, updateCard, type Card } from "./cardsApi";
 
 export function useCardsQuery(boardId: string) {
@@ -24,7 +25,8 @@ export function useCreateCardMutation(boardId: string) {
     }) => createCard(boardId, columnId, title, afterPosition),
     onSuccess: () => void qc.invalidateQueries({ queryKey: cardKeys.byBoard(boardId) }),
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : "Failed to create card");
+      console.error("[createCard] failed", err);
+      toast.error(formatSupabaseError(err, "Create card"), { duration: 8000 });
     },
   });
 }

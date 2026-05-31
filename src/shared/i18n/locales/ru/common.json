@@ -27,5 +27,10 @@
   "esc": "Esc",
   "close": "закрыть",
   "open": "открыть",
-  "navigate": "навигация"
+  "navigate": "навигация",
+  "searchPlaceholder": "Поиск досок и карточек…",
+  "searchEmpty": "Начните вводить запрос…",
+  "searchNoResults": "Нет результатов по «{{query}}»",
+  "searchTypeBoard": "доска",
+  "searchTypeCard": "карточка"
 }

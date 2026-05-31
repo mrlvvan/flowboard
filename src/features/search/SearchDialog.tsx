@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { I } from "@/shared/ui/icons";
@@ -7,6 +8,7 @@ import { useSearch } from "./useSearch";
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
 export function SearchDialog({ open, onOpenChange }: Props) {
+  const { t } = useTranslation("common");
   const { query, setQuery, results } = useSearch();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +75,7 @@ export function SearchDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-[540px] overflow-hidden border-0 bg-transparent p-0 shadow-none">
         <DialogHeader className="sr-only">
-          <DialogTitle>Search</DialogTitle>
+          <DialogTitle>{t("search")}</DialogTitle>
         </DialogHeader>
         <div
           className="fb-glass-strong fb-ring-inner overflow-hidden rounded-2xl"
@@ -90,7 +92,7 @@ export function SearchDialog({ open, onOpenChange }: Props) {
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Search boards and cards…"
+              placeholder={t("searchPlaceholder")}
               className="min-w-0 flex-1 bg-transparent text-[14px] text-white outline-none placeholder:text-white/30"
             />
             {query && (
@@ -110,13 +112,11 @@ export function SearchDialog({ open, onOpenChange }: Props) {
           <div ref={listRef} className="max-h-[340px] overflow-y-auto py-1.5">
             {results.length === 0 && query.length >= 2 && (
               <p className="px-4 py-8 text-center text-[13px] text-white/35">
-                No results for &ldquo;{query}&rdquo;
+                {t("searchNoResults", { query })}
               </p>
             )}
             {results.length === 0 && query.length < 2 && (
-              <p className="px-4 py-8 text-center text-[13px] text-white/35">
-                Start typing to search boards and cards…
-              </p>
+              <p className="px-4 py-8 text-center text-[13px] text-white/35">{t("searchEmpty")}</p>
             )}
             {results.map((r, idx) => (
               <button
@@ -134,7 +134,7 @@ export function SearchDialog({ open, onOpenChange }: Props) {
                 </span>
                 <span className="min-w-0 flex-1 truncate text-left">{r.title}</span>
                 <span className="shrink-0 rounded-md border border-white/[0.06] bg-white/[0.04] px-1.5 py-0.5 text-[10.5px] text-white/40 capitalize">
-                  {r.type}
+                  {r.type === "board" ? t("searchTypeBoard") : t("searchTypeCard")}
                 </span>
               </button>
             ))}
@@ -142,11 +142,13 @@ export function SearchDialog({ open, onOpenChange }: Props) {
 
           {/* Footer hint */}
           <div className="flex items-center gap-3 border-t border-white/[0.05] px-4 py-2 text-[11px] text-white/30">
-            <span>↑↓ navigate</span>
+            <span>↑↓ {t("navigate")}</span>
             <span className="h-3 w-px bg-white/10" />
-            <span>↵ open</span>
+            <span>↵ {t("open")}</span>
             <span className="h-3 w-px bg-white/10" />
-            <span>Esc close</span>
+            <span>
+              {t("esc")} {t("close")}
+            </span>
           </div>
         </div>
       </DialogContent>

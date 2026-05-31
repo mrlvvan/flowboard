@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Props) {
+  const { t } = useTranslation("boards");
   const [copied, setCopied] = useState(false);
   const inviteUrl = `${window.location.origin}/board/${boardId}`;
 
@@ -31,7 +33,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
   const copyLink = async () => {
     await navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
-    toast.success("Link copied to clipboard");
+    toast.success(t("linkCopied"));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -48,7 +50,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
 
     const profile = Array.isArray(matches) ? matches[0] : null;
     if (!profile) {
-      toast.error("User not found. They need to sign up first.");
+      toast.error(t("inviteNotFound"));
       return;
     }
 
@@ -58,14 +60,14 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
 
     if (memberError) {
       if (memberError.code === "23505") {
-        toast.error("This user already has access to the board.");
+        toast.error(t("inviteAlreadyMember"));
       } else {
         toast.error(memberError.message);
       }
       return;
     }
 
-    toast.success(`${data.email} can now access this board`);
+    toast.success(t("inviteSuccess", { email: data.email }));
     reset();
   };
 
@@ -73,7 +75,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[480px] border-0 bg-transparent p-0 shadow-none">
         <DialogHeader className="sr-only">
-          <DialogTitle>Share board</DialogTitle>
+          <DialogTitle>{t("shareTitle", { name: boardName })}</DialogTitle>
         </DialogHeader>
         <div
           className="fb-glass-strong fb-ring-inner overflow-hidden rounded-2xl"
@@ -87,9 +89,9 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h2 className="text-[16px] font-semibold text-white">
-                  Share &ldquo;{boardName}&rdquo;
+                  {t("shareTitle", { name: boardName })}
                 </h2>
-                <p className="mt-0.5 text-[12.5px] text-white/45">Invite people to collaborate</p>
+                <p className="mt-0.5 text-[12.5px] text-white/45">{t("shareSubtitle")}</p>
               </div>
               <button
                 onClick={() => onOpenChange(false)}
@@ -102,7 +104,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
             {/* Invite by email */}
             <form onSubmit={handleSubmit(onSubmit)} className="mb-5">
               <span className="mb-2 block text-[11.5px] font-medium tracking-[0.06em] text-white/55 uppercase">
-                Invite by email
+                {t("inviteByEmail")}
               </span>
               <div className="flex gap-2">
                 <div className="relative flex-1">
@@ -111,7 +113,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
                   </span>
                   <input
                     type="email"
-                    placeholder="colleague@example.com"
+                    placeholder={t("inviteEmailPlaceholder")}
                     {...register("email")}
                     className="fb-input h-10 w-full rounded-xl pr-3 pl-9 text-[13.5px]"
                   />
@@ -121,7 +123,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
                   disabled={isSubmitting}
                   className="fb-grad-btn h-10 rounded-xl px-4 text-[13.5px] font-semibold text-white disabled:opacity-60"
                 >
-                  {isSubmitting ? "…" : "Invite"}
+                  {isSubmitting ? "…" : t("inviteBtn")}
                 </button>
               </div>
               {errors.email && (
@@ -132,7 +134,7 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
             {/* Divider */}
             <div className="mb-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-white/[0.06]" />
-              <span className="text-[11px] text-white/35">or share link</span>
+              <span className="text-[11px] text-white/35">{t("shareOrLink")}</span>
               <div className="h-px flex-1 bg-white/[0.06]" />
             </div>
 
@@ -150,14 +152,12 @@ export function ShareBoardDialog({ boardId, boardName, open, onOpenChange }: Pro
                 }`}
               >
                 {copied ? I.Check : I.Share}
-                {copied ? "Copied!" : "Copy"}
+                {copied ? t("copied") : t("copyLink")}
               </button>
             </div>
 
             {/* Role note */}
-            <p className="mt-3 text-[11.5px] text-white/35">
-              Invited members get <span className="text-white/55">editor</span> access by default.
-            </p>
+            <p className="mt-3 text-[11.5px] text-white/35">{t("inviteRoleNote")}</p>
           </div>
         </div>
       </DialogContent>

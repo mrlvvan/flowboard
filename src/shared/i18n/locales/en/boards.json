@@ -14,5 +14,18 @@
   "openBoard": "Open board",
   "lastUpdated": "Updated {{date}}",
   "member": "{{count}} member",
-  "member_other": "{{count}} members"
+  "member_other": "{{count}} members",
+  "shareTitle": "Share \"{{name}}\"",
+  "shareSubtitle": "Invite people to collaborate",
+  "inviteByEmail": "Invite by email",
+  "inviteEmailPlaceholder": "colleague@example.com",
+  "inviteBtn": "Invite",
+  "shareOrLink": "or share link",
+  "copyLink": "Copy",
+  "copied": "Copied!",
+  "linkCopied": "Link copied to clipboard",
+  "inviteNotFound": "User not found. They need to sign up first.",
+  "inviteSuccess": "{{email}} can now access this board",
+  "inviteAlreadyMember": "This user already has access to the board.",
+  "inviteRoleNote": "Invited members get <strong>editor</strong> access by default."
 }

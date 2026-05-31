@@ -7,13 +7,38 @@
 A portfolio project showcasing modern React patterns — strict TypeScript, optimistic UI,
 IndexedDB as a first-class persistence layer, and Supabase Realtime for live multi-user editing.
 
+[**Live demo →**](https://flowboard-umber.vercel.app)
+
 [![CI](https://github.com/mrlvvan/flowboard/actions/workflows/ci.yml/badge.svg)](https://github.com/mrlvvan/flowboard/actions)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Realtime-3ecf8e?logo=supabase&logoColor=white)
 
+<br />
+
+<!-- Replace docs/screenshots/demo.gif with a real recording — see docs/screenshots/README.md -->
+
+![FlowBoard demo](docs/screenshots/demo.gif)
+
 </div>
+
+---
+
+## Try it
+
+The live deployment runs on Vercel against a real Supabase project — fully functional:
+
+🔗 **<https://flowboard-umber.vercel.app>**
+
+Either register a new account (email + password, no confirmation required), or use:
+
+| Email                | Password   |
+| -------------------- | ---------- |
+| `demo@flowboard.app` | `demo1234` |
+
+The demo account ships with a couple of pre-seeded boards so you can poke around
+without setting anything up.
 
 ---
 
@@ -44,6 +69,21 @@ that show up in real products:
 - 📦 **PWA** — installable, manifest, splash, theme-color
 - 🌍 **i18n** — English + Russian, auto-detected from browser locale
 - 🧪 **Tested** — Vitest unit (sync queue, position calc, offline engine) + Playwright E2E (10 workflow scenarios)
+
+<br />
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/board.png" alt="Kanban board" /><br/>
+      <em>Drag-and-drop with fractional positions</em>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/card-modal.png" alt="Card detail modal" /><br/>
+      <em>Markdown editor, checklist, labels, comments</em>
+    </td>
+  </tr>
+</table>
 
 ---
 

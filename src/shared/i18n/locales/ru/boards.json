@@ -15,5 +15,18 @@
   "lastUpdated": "Обновлено {{date}}",
   "member": "{{count}} участник",
   "member_few": "{{count}} участника",
-  "member_many": "{{count}} участников"
+  "member_many": "{{count}} участников",
+  "shareTitle": "Поделиться «{{name}}»",
+  "shareSubtitle": "Пригласите коллег к совместной работе",
+  "inviteByEmail": "Пригласить по email",
+  "inviteEmailPlaceholder": "colleague@example.com",
+  "inviteBtn": "Пригласить",
+  "shareOrLink": "или скопируйте ссылку",
+  "copyLink": "Скопировать",
+  "copied": "Скопировано!",
+  "linkCopied": "Ссылка скопирована в буфер",
+  "inviteNotFound": "Пользователь не найден. Сначала ему нужно зарегистрироваться.",
+  "inviteSuccess": "{{email}} получил доступ к доске",
+  "inviteAlreadyMember": "У этого пользователя уже есть доступ к доске.",
+  "inviteRoleNote": "Приглашённые получают роль <strong>редактор</strong> по умолчанию."
 }

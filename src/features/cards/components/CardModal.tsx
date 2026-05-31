@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { format } from "date-fns";
@@ -88,6 +89,8 @@ type Props = {
 
 // ── Component ─────────────────────────────────────────────────────────
 export function CardModal({ card, boardId, open, onOpenChange }: Props) {
+  const { t } = useTranslation("cards");
+  const { t: tc } = useTranslation("common");
   const updateMutation = useUpdateCardMutation(boardId);
   const { deleteCardUndoable } = useCardCommands(boardId);
 
@@ -144,8 +147,8 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
   const handleDelete = async () => {
     onOpenChange(false);
     await deleteCardUndoable(card);
-    toast.success(`Card deleted`, {
-      description: "Press ⌘Z to undo",
+    toast.success(t("cardDeleted"), {
+      description: t("undoHint"),
     });
   };
 
@@ -250,7 +253,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
               <section className="mb-7">
                 <div className="mb-2.5 flex items-center justify-between">
                   <h3 className="text-[12px] font-semibold tracking-[0.12em] text-white/55 uppercase">
-                    Description
+                    {t("description")}
                   </h3>
                   <div className="flex items-center gap-0.5 rounded-md border border-white/[0.06] bg-black/30 p-0.5 text-[11px]">
                     <button
@@ -260,13 +263,13 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                       }}
                       className={`rounded px-2 py-0.5 font-medium transition ${descMode === "edit" ? "bg-white/[0.08] text-white" : "text-white/45 hover:text-white"}`}
                     >
-                      Edit
+                      {tc("edit")}
                     </button>
                     <button
                       onClick={() => setDescMode("preview")}
                       className={`rounded px-2 py-0.5 transition ${descMode === "preview" ? "bg-white/[0.08] font-medium text-white" : "text-white/45 hover:text-white"}`}
                     >
-                      Preview
+                      {t("preview")}
                     </button>
                   </div>
                 </div>
@@ -276,7 +279,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                     <textarea
                       value={descInput}
                       onChange={(e) => setDescInput(e.target.value)}
-                      placeholder="Add a description… (supports Markdown)"
+                      placeholder={t("descriptionPlaceholder")}
                       rows={6}
                       autoFocus
                       className="fb-input w-full resize-none rounded-xl p-3 text-[13px] leading-relaxed"
@@ -286,13 +289,13 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                         onClick={() => void saveDescription()}
                         className="fb-grad-btn h-8 rounded-lg px-3 text-[12.5px] font-medium text-white"
                       >
-                        Save
+                        {tc("save")}
                       </button>
                       <button
                         onClick={() => setEditingDesc(false)}
                         className="h-8 rounded-lg px-3 text-[12.5px] text-white/50 transition hover:bg-white/[0.05] hover:text-white"
                       >
-                        Cancel
+                        {tc("cancel")}
                       </button>
                     </div>
                   </div>
@@ -317,7 +320,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{descInput}</ReactMarkdown>
                       </div>
                     ) : (
-                      <p className="text-white/30">Add a description… (supports Markdown)</p>
+                      <p className="text-white/30">{t("descriptionPlaceholder")}</p>
                     )}
                   </div>
                 )}
@@ -328,9 +331,9 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                 <section className="mb-6">
                   <div className="mb-2.5 flex items-center justify-between">
                     <h3 className="flex items-center gap-2 text-[12px] font-semibold tracking-[0.12em] text-white/55 uppercase">
-                      Checklist
+                      {t("checklist")}
                       <span className="font-normal tracking-normal text-white/40 normal-case">
-                        · {doneCount} of {checklist.length}
+                        · {t("checklistDoneOf", { done: doneCount, total: checklist.length })}
                       </span>
                     </h3>
                     <span className="text-[11.5px] font-medium text-white/55">{progressPct}%</span>
@@ -391,7 +394,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                     <input
                       value={newItemText}
                       onChange={(e) => setNewItemText(e.target.value)}
-                      placeholder="Add item…"
+                      placeholder={t("checklistItemPlaceholder")}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") void addChecklistItem();
                       }}
@@ -401,7 +404,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                       onClick={() => void addChecklistItem()}
                       className="fb-grad-btn h-8 rounded-lg px-3 text-[12.5px] font-medium text-white"
                     >
-                      Add
+                      {tc("add")}
                     </button>
                   </div>
                 </section>
@@ -414,12 +417,12 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
             {/* Sidebar */}
             <aside className="fb-scroll w-64 shrink-0 overflow-y-auto border-l border-white/[0.06] bg-black/20 p-5">
               <div className="mb-3 text-[11px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-                Properties
+                {t("properties")}
               </div>
 
               {/* Label picker */}
               <div className="mb-5">
-                <div className="mb-2 text-[11.5px] text-white/55">Labels</div>
+                <div className="mb-2 text-[11.5px] text-white/55">{t("labels")}</div>
                 <div className="grid grid-cols-6 gap-1.5">
                   {LABEL_NAMES.map((k) => {
                     const v = LABEL_HEX[k]!;
@@ -460,7 +463,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
 
               {/* Due date */}
               <div className="mb-5">
-                <div className="mb-2 text-[11.5px] text-white/55">Due date</div>
+                <div className="mb-2 text-[11.5px] text-white/55">{t("dueDate")}</div>
                 <input
                   type="date"
                   value={dueDate ? format(dueDate, "yyyy-MM-dd") : ""}
@@ -490,7 +493,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
                     }}
                     className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] text-white/65 transition hover:bg-white/[0.05] hover:text-white"
                   >
-                    {I.Check} Add checklist
+                    {I.Check} {t("addChecklist")}
                   </button>
                 </div>
               )}
@@ -501,7 +504,7 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
               <div className="space-y-1">
                 <SidebarAction
                   icon={I.Trash}
-                  label="Delete card"
+                  label={t("deleteCard")}
                   danger
                   onClick={() => void handleDelete()}
                 />
@@ -513,18 +516,20 @@ export function CardModal({ card, boardId, open, onOpenChange }: Props) {
           <div className="flex shrink-0 items-center justify-between border-t border-white/[0.05] bg-black/30 px-7 py-2.5 text-[11.5px] text-white/45">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5">
-                <span className="fb-pulse h-1.5 w-1.5 rounded-full bg-emerald-400" /> Saved
+                <span className="fb-pulse h-1.5 w-1.5 rounded-full bg-emerald-400" /> {t("saved")}
               </span>
               <span className="h-3 w-px bg-white/10" />
               <span>
-                Created {card.created_at ? format(new Date(card.created_at), "MMM d") : "recently"}
+                {card.created_at
+                  ? t("created", { date: format(new Date(card.created_at), "MMM d") })
+                  : t("createdRecently")}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <kbd className="rounded border border-white/[0.06] bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-white/55">
-                Esc
+                {tc("esc")}
               </kbd>
-              <span>to close</span>
+              <span>{tc("close")}</span>
             </div>
           </div>
         </div>

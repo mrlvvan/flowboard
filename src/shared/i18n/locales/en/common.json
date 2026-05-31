@@ -27,5 +27,10 @@
   "esc": "Esc",
   "close": "close",
   "open": "open",
-  "navigate": "navigate"
+  "navigate": "navigate",
+  "searchPlaceholder": "Search boards and cards…",
+  "searchEmpty": "Start typing to search boards and cards…",
+  "searchNoResults": "No results for \"{{query}}\"",
+  "searchTypeBoard": "board",
+  "searchTypeCard": "card"
 }

@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
+import { ru, enUS } from "date-fns/locale";
 import { I } from "@/shared/ui/icons";
 import { useAuth } from "@/features/auth";
 import {
@@ -29,6 +31,9 @@ function CommentRow({
   onUpdate: (body: string) => void;
   onDelete: () => void;
 }) {
+  const { t, i18n } = useTranslation("cards");
+  const { t: tc } = useTranslation("common");
+  const locale = i18n.language === "ru" ? ru : enUS;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(comment.body);
 
@@ -51,10 +56,10 @@ function CommentRow({
         <div className="flex items-baseline gap-2">
           <span className="text-[12.5px] font-medium text-white/90">{name}</span>
           <span className="text-[10.5px] text-white/35">
-            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale })}
           </span>
           {comment.created_at !== comment.updated_at && (
-            <span className="text-[10.5px] text-white/30 italic">(edited)</span>
+            <span className="text-[10.5px] text-white/30 italic">{t("edited")}</span>
           )}
         </div>
 
@@ -77,7 +82,7 @@ function CommentRow({
                 disabled={!draft.trim()}
                 className="fb-grad-btn h-7 rounded-md px-2.5 text-[11.5px] font-medium text-white disabled:opacity-60"
               >
-                Save
+                {tc("save")}
               </button>
               <button
                 onClick={() => {
@@ -86,7 +91,7 @@ function CommentRow({
                 }}
                 className="h-7 rounded-md px-2.5 text-[11.5px] text-white/55 transition hover:bg-white/[0.05] hover:text-white"
               >
-                Cancel
+                {tc("cancel")}
               </button>
             </div>
           </div>
@@ -101,13 +106,13 @@ function CommentRow({
                   onClick={() => setEditing(true)}
                   className="text-[10.5px] text-white/45 hover:text-white/80"
                 >
-                  Edit
+                  {tc("edit")}
                 </button>
                 <button
                   onClick={onDelete}
                   className="text-[10.5px] text-rose-300/70 hover:text-rose-300"
                 >
-                  Delete
+                  {tc("delete")}
                 </button>
               </div>
             )}
@@ -120,6 +125,7 @@ function CommentRow({
 
 // ── Main component ──────────────────────────────────────────────────────────
 export function CardComments({ cardId, boardId }: Props) {
+  const { t } = useTranslation("cards");
   const { user } = useAuth();
   const { data: comments = [], isLoading } = useCommentsQuery(cardId);
   const createMutation = useCreateCommentMutation(cardId);
@@ -144,7 +150,7 @@ export function CardComments({ cardId, boardId }: Props) {
     <section className="mb-2">
       <div className="mb-3 flex items-center gap-2">
         <h3 className="text-[12px] font-semibold tracking-[0.12em] text-white/55 uppercase">
-          Comments
+          {t("comments")}
         </h3>
         {comments.length > 0 && (
           <span className="rounded-md bg-white/[0.05] px-1.5 py-[1px] text-[10.5px] font-medium text-white/45">
@@ -172,7 +178,7 @@ export function CardComments({ cardId, boardId }: Props) {
                   void submit();
                 }
               }}
-              placeholder="Write a comment… (Ctrl/⌘+Enter to send)"
+              placeholder={t("writeComment")}
               rows={2}
               className="fb-input w-full resize-none rounded-lg p-2.5 text-[12.5px] leading-relaxed"
             />
@@ -182,7 +188,7 @@ export function CardComments({ cardId, boardId }: Props) {
                 disabled={createMutation.isPending}
                 className="fb-grad-btn h-7 rounded-md px-3 text-[11.5px] font-medium text-white disabled:opacity-60"
               >
-                {createMutation.isPending ? "Posting…" : "Post comment"}
+                {createMutation.isPending ? t("addingCard") : t("postComment")}
               </button>
             )}
           </div>
@@ -205,7 +211,7 @@ export function CardComments({ cardId, boardId }: Props) {
       ) : comments.length === 0 ? (
         <p className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.06] px-3 py-3 text-[12px] text-white/35">
           <span className="text-white/30">{I.Bell}</span>
-          No comments yet. Be the first to start the discussion.
+          {t("noComments")}
         </p>
       ) : (
         <div className="space-y-4">

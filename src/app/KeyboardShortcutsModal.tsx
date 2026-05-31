@@ -1,32 +1,41 @@
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
-const SHORTCUTS = [
-  {
-    section: "Navigation",
-    items: [
-      { keys: ["/"], description: "Open search" },
-      { keys: ["⌘", "K"], description: "Open search" },
-      { keys: ["N"], description: "New board" },
-      { keys: ["?"], description: "Show keyboard shortcuts" },
-    ],
-  },
-  {
-    section: "Board",
-    items: [
-      { keys: ["Esc"], description: "Close modal / cancel edit" },
-      { keys: ["Enter"], description: "Save inline edit" },
-    ],
-  },
-  {
-    section: "Edit history",
-    items: [
-      { keys: ["⌘", "Z"], description: "Undo last action" },
-      { keys: ["⌘", "⇧", "Z"], description: "Redo" },
-    ],
-  },
-];
+type ShortcutSection = {
+  section: string;
+  items: { keys: string[]; description: string }[];
+};
+
+function useShortcuts(): ShortcutSection[] {
+  const { t } = useTranslation("shortcuts");
+  return [
+    {
+      section: t("navigation"),
+      items: [
+        { keys: ["/"], description: t("openSearch") },
+        { keys: ["⌘", "K"], description: t("openSearch") },
+        { keys: ["N"], description: t("newBoard") },
+        { keys: ["?"], description: t("showShortcuts") },
+      ],
+    },
+    {
+      section: t("board"),
+      items: [
+        { keys: ["Esc"], description: t("closeOrCancel") },
+        { keys: ["Enter"], description: t("saveInlineEdit") },
+      ],
+    },
+    {
+      section: t("editHistory"),
+      items: [
+        { keys: ["⌘", "Z"], description: t("undo") },
+        { keys: ["⌘", "⇧", "Z"], description: t("redo") },
+      ],
+    },
+  ];
+}
 
 function Kbd({ children }: { children: string }) {
   return (
@@ -37,11 +46,13 @@ function Kbd({ children }: { children: string }) {
 }
 
 export function KeyboardShortcutsModal({ open, onOpenChange }: Props) {
+  const { t } = useTranslation("shortcuts");
+  const SHORTCUTS = useShortcuts();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[420px] border-0 bg-transparent p-0 shadow-none">
         <DialogHeader className="sr-only">
-          <DialogTitle>Keyboard shortcuts</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
         <div
           className="fb-glass-strong fb-ring-inner overflow-hidden rounded-2xl"
@@ -49,7 +60,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: Props) {
         >
           <div className="h-[3px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500" />
           <div className="px-6 py-5">
-            <h2 className="mb-5 text-[16px] font-semibold text-white">Keyboard shortcuts</h2>
+            <h2 className="mb-5 text-[16px] font-semibold text-white">{t("title")}</h2>
             <div className="space-y-5">
               {SHORTCUTS.map((section) => (
                 <div key={section.section}>
@@ -74,9 +85,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: Props) {
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-center text-[11.5px] text-white/30">
-              Press <Kbd>?</Kbd> to toggle this panel
-            </p>
+            <p className="mt-5 text-center text-[11.5px] text-white/30">{t("togglePanelHint")}</p>
           </div>
         </div>
       </DialogContent>

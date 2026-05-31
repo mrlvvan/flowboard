@@ -1,0 +1,14 @@
+{
+  "title": "Keyboard shortcuts",
+  "navigation": "Navigation",
+  "board": "Board",
+  "editHistory": "Edit history",
+  "openSearch": "Open search",
+  "newBoard": "New board",
+  "showShortcuts": "Show keyboard shortcuts",
+  "closeOrCancel": "Close modal / cancel edit",
+  "saveInlineEdit": "Save inline edit",
+  "undo": "Undo last action",
+  "redo": "Redo",
+  "togglePanelHint": "Press ? to toggle this panel"
+}
